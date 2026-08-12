@@ -1,0 +1,28 @@
+{
+  "name": "sma-lead-backend",
+  "version": "1.0.0",
+  "description": "Lead capture, PDF guide delivery, and email nurture backend for the San Miguel de Allende real estate site",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "init-db": "node scripts/init-db.js",
+    "send-nurture": "node scripts/send-nurture.js",
+    "ping-nurture": "node scripts/ping-nurture.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "resend": "^4.0.0"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.33.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

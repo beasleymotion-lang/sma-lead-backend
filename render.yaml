@@ -1,0 +1,76 @@
+# render.yaml — Render Blueprint
+#
+# This deploys the actual sma-backend as a real always-on web service, which
+# is the right kind of host for SQLite (unlike Vercel/Lambda serverless
+# functions — see README "Known limitations" for why that matters).
+#
+# HOW TO USE:
+#   1. Push this whole sma-backend folder to a GitHub repo.
+#   2. In Render (render.com): New -> Blueprint -> connect that repo.
+#      Render reads this file automatically and sets both services up.
+#   3. Render will prompt you to fill in the secret env vars marked
+#      `sync: false` below (RESEND_API_KEY, FROM_EMAIL, NOTIFY_EMAIL,
+#      ADMIN_PASSWORD, SITE_URL, ALLOWED_ORIGIN) during setup.
+#   4. Deploy. You'll get a URL like https://sma-backend-xxxx.onrender.com.
+#   5. Put that URL into API_BASE_URL near the top of the website's
+#      <script> tag, and into SITE_URL below (Render will ask for it).
+#
+# The free Render plan works for testing, but spins the service down after
+# inactivity (the nurture cron job would then wake it, which is fine, but
+# the site's live listings fetch may feel slow on a cold start). A paid
+# "Starter" instance keeps it always warm — worth it once this is real.
+
+services:
+  - type: web
+    name: sma-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    disk:
+      name: sma-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: DB_PATH
+        value: /var/data/leads.db
+      - key: PROPERTIES_DB_PATH
+        value: /var/data/properties.db
+      - key: CRM_DB_PATH
+        value: /var/data/crm.db
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
+      - key: NOTIFY_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SITE_URL
+        sync: false
+      - key: ALLOWED_ORIGIN
+        sync: false
+      - key: INTERNAL_CRON_KEY
+        sync: false # generate any long random string; must match the cron job below exactly
+
+  # Triggers the nurture-email send once a day via a single HTTP call to the
+  # web service above (POST /api/internal/run-nurture). This job itself
+  # needs no disk and no database access — the web service already has both,
+  # since it owns the persistent disk. See scripts/ping-nurture.js.
+  - type: cron
+    name: sma-nurture-ping
+    runtime: node
+    plan: free
+    schedule: "0 14 * * *" # 14:00 UTC daily — adjust to your timezone preference
+    buildCommand: npm install
+    startCommand: npm run ping-nurture
+    envVars:
+      - key: SITE_URL
+        sync: false # same value as the web service's own SITE_URL
+      - key: INTERNAL_CRON_KEY
+        sync: false # must exactly match the web service's INTERNAL_CRON_KEY
