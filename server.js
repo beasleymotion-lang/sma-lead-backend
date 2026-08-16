@@ -37,6 +37,11 @@ app.use('/guides', express.static(path.join(__dirname, 'public', 'guides')));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
+// Serve the San Miguel Luxury Realty homepage
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'san-miguel-luxury-realty.html'));
+});
+
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 app.use('/api', guideRequestRoute);
