@@ -1,1 +1,8 @@
-version2, builds source san-miguel-luxury-realty.html, use at vercel slash static, routes source root destination san-miguel-luxury-realty.html.
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/san-miguel-luxury-realty.html"
+    }
+  ]
+}
