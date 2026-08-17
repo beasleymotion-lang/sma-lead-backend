@@ -35,16 +35,6 @@ app.use('/api/admin', express.json({ limit: ADMIN_BODY_LIMIT }));
 
 // Static file serving
 app.use('/guides', express.static(path.join(__dirname, 'public', 'guides')));
-// Property photos are stored in the same directory configured by image-store.js.
-// Render uses /var/data/uploads so uploads survive deploys; local development
-// falls back to public/uploads. Keeping both paths on the same source prevents
-// the API from returning /uploads/... URLs that Express cannot actually serve.
-app.use('/uploads', express.static(UPLOAD_DIR, {
-  fallthrough: false,
-  maxAge: '7d',
-  etag: true,
-  lastModified: true
-}));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 // Serve the San Miguel Luxury Realty homepage
