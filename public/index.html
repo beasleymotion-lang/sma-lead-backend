@@ -2401,19 +2401,19 @@ function renderListings(){
       </div>
     </div>`;
   }).join('');
-  grid.querySelectorAll('.listing-view-btn').forEach((btn) => {
+ grid.querySelectorAll('.listing-view-btn').forEach((btn) => {
   btn.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
 
     const slug = btn.dataset.propertySlug;
+    const index = Number(btn.dataset.propertyIndex);
 
-    if (!slug) {
-      console.error('Listing has no slug:', btn);
-      return;
+    if (slug && typeof window.openLuxuryPropertyBySlug === 'function') {
+      window.openLuxuryPropertyBySlug(slug, index);
+    } else if (typeof window.openLuxuryPropertyDetail === 'function') {
+      window.openLuxuryPropertyDetail(index);
     }
-
-    window.location.href = `/properties/${encodeURIComponent(slug)}`;
   });
 });
   staggerIn(grid);
