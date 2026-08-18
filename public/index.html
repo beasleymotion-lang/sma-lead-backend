@@ -2401,24 +2401,49 @@ function renderListings(){
       </div>
     </div>`;
   }).join('');
- grid.querySelectorAll('.listing-view-btn').forEach((btn) => {
-  btn.addEventListener('click', (event) => {
+grid.querySelectorAll('.listing-view-btn').forEach((btn) => {
+  btn.addEventListener('click', async (event) => {
     event.preventDefault();
     event.stopPropagation();
 
     const slug = btn.dataset.propertySlug;
-    const index = Number(btn.dataset.propertyIndex);
 
-    if (slug && typeof window.openLuxuryPropertyBySlug === 'function') {
-      window.openLuxuryPropertyBySlug(slug, index);
-    } else if (typeof window.openLuxuryPropertyDetail === 'function') {
-      window.openLuxuryPropertyDetail(index);
+    if (!slug) {
+      console.error('No property slug found.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/properties/${encodeURIComponent(slug)}`);
+      const data = await res.json();
+
+      if (!res.ok || !data.ok || !data.property) {
+        throw new Error(data.error || 'Property not found');
+      }
+
+      const property = data.property;
+
+      // Use the existing detail function if available.
+      if (typeof openLuxuryPropertyDetail === 'function') {
+        const index = propertiesCache.findIndex(
+          p => String(p.slug) === String(slug)
+        );
+
+        if (index >= 0) {
+          openLuxuryPropertyDetail(index);
+          return;
+        }
+      }
+
+      // Fallback: open the property URL if the detail modal isn't available.
+      window.location.href = `/properties/${encodeURIComponent(slug)}`;
+
+    } catch (err) {
+      console.error('Could not open property:', err);
+      alert('Unable to open this property. Please try again.');
     }
   });
 });
-  staggerIn(grid);
-}
-
 function renderSkeleton(container, count){
   container.innerHTML = Array.from({length:count}).map(()=>`
     <div class="skel-card">
