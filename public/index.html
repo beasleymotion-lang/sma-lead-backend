@@ -2402,15 +2402,20 @@ function renderListings(){
     </div>`;
   }).join('');
   grid.querySelectorAll('.listing-view-btn').forEach((btn) => {
-    btn.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const slug = btn.dataset.propertySlug;
-      const index = Number(btn.dataset.propertyIndex);
-      if (slug) openLuxuryPropertyBySlug(slug, index);
-      else openLuxuryPropertyDetail(index);
-    });
+  btn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const slug = btn.dataset.propertySlug;
+
+    if (!slug) {
+      console.error('Listing has no slug:', btn);
+      return;
+    }
+
+    window.location.href = `/properties/${encodeURIComponent(slug)}`;
   });
+});
   staggerIn(grid);
 }
 
