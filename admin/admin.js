@@ -1,13 +1,16 @@
 // admin/admin.js
 // Vanilla JS — no build step, no framework, matches the site's own approach.
 
-const API_BASE_URL = ''; // set to the deployed backend origin if admin is served from elsewhere
+// admin/admin.js
+// Vanilla JS — no build step, no framework, matches the site's own approach.
+
+const API_BASE_URL = 'https://sma-lead-backend.onrender.com';
 
 let authToken = sessionStorage.getItem('sma_admin_token') || null;
 let currentView = 'dashboard';
 let propertiesCache = [];
 let editingPropertyId = null;
-let formImages = []; // {url, order} for existing + {dataUri, isNew} for pending uploads
+let formImages = [];
 const MAX_LISTING_PHOTOS = 20;
 const PHOTO_UPLOAD_BATCH_SIZE = 3;
 let formTags = { highlights: [], features: [], amenities: [] };
