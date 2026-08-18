@@ -304,8 +304,11 @@ function openPropertyForm(id = null) {
   setupDropzone();
   document.getElementById('property-form').addEventListener('submit', submitPropertyForm);
   document.getElementById('form-overlay').classList.add('show');
-}
 function esc(v) { return v == null ? '' : String(v).replace(/"/g, '&quot;'); }
+
+function val(id) {
+  return (document.getElementById(id)?.value || '').trim();
+}
 
 function tagInputSection(label, key) {
   return `<div class="field">
