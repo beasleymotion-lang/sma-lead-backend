@@ -3,7 +3,6 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { insertLead, scheduleNurtureSequence, findRecentLeadByEmail } = require('../lib/db');
 const { guideDeliveryEmail, internalLeadNotification, sendEmail, GUIDE_META } = require('../lib/email');
-const crmDb = require('../lib/crm-db');
 
 const router = express.Router();
 
@@ -72,17 +71,6 @@ router.post('/guide-request', limiter, async (req, res) => {
 
     scheduleNurtureSequence(leadId);
 
-    // Also write the guide request to the CRM used by the admin dashboard.
-    const crmLead = crmDb.createLead({
-      name: `${clean.firstName} ${clean.lastName}`.trim(),
-      email: clean.email,
-      phone: clean.phone || '',
-      source: 'guide_download',
-      lead_type: clean.intent === 'selling' ? 'seller' : clean.intent === 'buying' ? 'buyer' : 'consultation',
-      notes: `Guide: ${clean.guide}\nIntent: ${clean.intent}\nBudget: ${clean.budget || 'Not provided'}` ,
-      budget: clean.budget || null
-    });
-
     const timestamp = new Date().toLocaleString('en-US', { timeZone: 'America/Mexico_City' });
 
     // Send visitor delivery email + internal notification in parallel.
@@ -95,7 +83,7 @@ router.post('/guide-request', limiter, async (req, res) => {
 
     if (visitorResult.status === 'rejected') {
       console.error('[guide-request] Failed to send visitor guide email:', visitorResult.reason);
-      return res.status(502).json({ ok: false, leadId: crmLead?.id || leadId, error: 'Your information was saved, but the guide email could not be sent. Please try again.' });
+      return res.status(502).json({ ok: false, leadId, error: 'Your information was saved, but the guide email could not be delivered. Please try again or contact us directly.' });
     }
     if (internalResult.status === 'rejected') {
       console.error('[guide-request] Failed to send internal notification:', internalResult.reason);
