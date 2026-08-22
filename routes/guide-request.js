@@ -81,14 +81,22 @@ router.post('/guide-request', limiter, async (req, res) => {
       sendEmail(internalLeadNotification({ ...clean, timestamp })),
     ]);
 
-    if (visitorResult.status === 'rejected') {
-      console.error('[guide-request] Failed to send visitor guide email:', visitorResult.reason);
-    }
     if (internalResult.status === 'rejected') {
       console.error('[guide-request] Failed to send internal notification:', internalResult.reason);
     }
 
-    return res.json({ ok: true, leadId });
+    // Do not tell the visitor that the guide was delivered if the delivery
+    // email actually failed. The lead is still saved and can be followed up.
+    if (visitorResult.status === 'rejected') {
+      console.error('[guide-request] Failed to send visitor guide email:', visitorResult.reason);
+      return res.status(502).json({
+        ok: false,
+        leadId,
+        error: 'Your request was saved, but the guide email could not be sent. Please try again or contact us directly.'
+      });
+    }
+
+    return res.json({ ok: true, leadId, emailSent: true });
   } catch (err) {
     console.error('[guide-request] Unexpected error:', err);
     return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again or email us directly.' });
