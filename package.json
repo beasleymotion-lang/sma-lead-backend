@@ -9,7 +9,9 @@
     "init-db": "node scripts/init-db.js",
     "send-nurture": "node scripts/send-nurture.js",
     "ping-nurture": "node scripts/ping-nurture.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "guides:build": "python3 guides-src/build_guides.py",
+    "guides:validate": "python3 guides-src/validate_guides.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0",
@@ -19,12 +21,8 @@
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
     "resend": "^4.0.0",
-    "ws": "^8.18.3"
+    "ws": "^8.18.0"
   },
-  "optionalDependencies": {
-    "sharp": "^0.33.5"
-  },
-  "engines": {
-    "node": ">=18"
-  }
+  "optionalDependencies": { "sharp": "^0.33.5" },
+  "engines": { "node": ">=18" }
 }
