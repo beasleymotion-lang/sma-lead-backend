@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 3001;
 const ADMIN_BODY_LIMIT = process.env.ADMIN_BODY_LIMIT || '25mb';
 const homeFile = path.join(__dirname, 'public', 'index.html');
 const homeMetadata = '<link rel="canonical" href="https://withbeasley.com/"><meta property="og:url" content="https://withbeasley.com/"><meta property="og:site_name" content="Blaze Beasley Real Estate"><meta name="twitter:card" content="summary_large_image">';
+const homeLinks = '<nav aria-label="San Miguel de Allende real estate guides" style="max-width:1200px;margin:0 auto 2rem;padding:0 1rem"><a href="/buying-san-miguel-de-allende">Buying in San Miguel de Allende</a> · <a href="/selling-san-miguel-de-allende">Selling in San Miguel de Allende</a> · <a href="/relocating-to-san-miguel-de-allende">Relocating to San Miguel de Allende</a> · <a href="/neighborhoods">Neighborhood guide</a></nav>';
 
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
 app.use('/api/guide-request', express.json({ limit: '10kb' }));
