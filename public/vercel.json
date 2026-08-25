@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "https://sma-lead-backend.onrender.com/:path*"
+    }
+  ]
+}
