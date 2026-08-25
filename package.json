@@ -10,6 +10,8 @@
     "send-nurture": "node scripts/send-nurture.js",
     "ping-nurture": "node scripts/ping-nurture.js",
     "dev": "node server.js",
+    "test": "npm run test:smoke",
+    "test:smoke": "node scripts/smoke-test.js",
     "guides:build": "python3 guides-src/build_guides.py",
     "guides:validate": "python3 guides-src/validate_guides.py"
   },
