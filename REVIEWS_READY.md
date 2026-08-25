@@ -1,0 +1,1 @@
+Authorized homepage testimonials are ready for integration into the live homepage. See reviews/homepage-testimonials.md.
