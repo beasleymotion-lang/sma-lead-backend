@@ -12,6 +12,16 @@ router.get('/sitemap.xml', async (req, res, next) => {
     const properties = await propertiesDb.listProperties({ sort: 'newest' });
     const staticPaths = [
       '/',
+      '/san-miguel-de-allende-real-estate',
+      '/san-miguel-de-allende-houses-for-sale',
+      '/san-miguel-de-allende-rentals',
+      '/san-miguel-de-allende-real-estate',
+      '/san-miguel-de-allende-houses-for-sale',
+      '/san-miguel-de-allende-rentals',
+      '/centro-san-miguel-de-allende-real-estate',
+      '/san-antonio-san-miguel-de-allende-real-estate',
+      '/guadiana-san-miguel-de-allende-real-estate',
+      '/buying-a-home-in-san-miguel-de-allende',
       '/buying-san-miguel-de-allende',
       '/selling-san-miguel-de-allende',
       '/relocating-to-san-miguel-de-allende',
@@ -26,7 +36,7 @@ router.get('/sitemap.xml', async (req, res, next) => {
       '/neighborhoods/malanquin',
       '/neighborhoods/ojo-de-agua',
       '/neighborhoods/zirandaro'
-    ];
+    ].filter((path, index, paths) => paths.indexOf(path) === index);
 
     const pages = staticPaths
       .map(path => ({ loc: `${SITE_URL}${path}`, priority: path === '/' ? '1.0' : path.startsWith('/neighborhoods/') ? '0.8' : '0.9' }))
