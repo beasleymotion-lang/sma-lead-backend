@@ -23,6 +23,5 @@
     "resend": "^4.0.0",
     "ws": "^8.18.0"
   },
-  "optionalDependencies": { "sharp": "^0.33.5" },
   "engines": { "node": ">=18" }
 }
