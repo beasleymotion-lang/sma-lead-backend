@@ -17,43 +17,26 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const ADMIN_BODY_LIMIT = process.env.ADMIN_BODY_LIMIT || '25mb';
 const homeFile = path.join(__dirname, 'public', 'index.html');
-const homeTitle = 'San Miguel de Allende Real Estate | WithBeasley';
-const homeDescription = 'Explore San Miguel de Allende real estate, homes for sale and rent, neighborhoods, and relocation resources with WithBeasley.';
-const homeMetadata = '<link rel="canonical" href="https://withbeasley.com/"><meta name="robots" content="index,follow,max-image-preview:large"><meta property="og:url" content="https://withbeasley.com/"><meta property="og:site_name" content="WithBeasley"><meta property="og:title" content="San Miguel de Allende Real Estate | WithBeasley"><meta property="og:description" content="Explore San Miguel de Allende real estate, homes for sale and rent, neighborhoods, and relocation resources with WithBeasley."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="San Miguel de Allende Real Estate | WithBeasley"><meta name="twitter:description" content="Explore San Miguel de Allende real estate, homes for sale and rent, neighborhoods, and relocation resources with WithBeasley."><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"WithBeasley","url":"https://withbeasley.com/","description":"San Miguel de Allende real estate, homes, properties and relocation guidance.","inLanguage":"en-US"}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"WithBeasley","url":"https://withbeasley.com/"}</script>';
+const homeTitle = 'San Miguel de Allende Real Estate | Homes for Sale & Rent | WithBeasley';
+const homeDescription = 'Explore homes for sale and rent in San Miguel de Allende, Guanajuato. Browse properties, neighborhoods, buying, selling, and relocation guidance with WithBeasley.';
+const homeMetadata = `<link rel="canonical" href="${SITE_URL}/"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"><meta property="og:url" content="${SITE_URL}/"><meta property="og:site_name" content="WithBeasley"><meta property="og:title" content="${homeTitle}"><meta property="og:description" content="${homeDescription}"><meta property="og:locale" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${homeTitle}"><meta name="twitter:description" content="${homeDescription}"><script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'WebSite',name:'WithBeasley',url:SITE_URL+'/',description:'San Miguel de Allende real estate, homes, properties and relocation guidance.',inLanguage:'en-US',publisher:{'@type':'Person',name:'Blaze Beasley',url:SITE_URL+'/'}}).replace(/</g,'\\u003c')}</script><script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'RealEstateAgent',name:'Blaze Beasley',url:SITE_URL+'/',description:'Independent real estate advisor serving buyers, sellers, and renters in San Miguel de Allende, Guanajuato.',areaServed:{'@type':'City',name:'San Miguel de Allende',containedInPlace:{'@type':'State',name:'Guanajuato',containedInPlace:{'@type':'Country',name:'Mexico'}}},address:{'@type':'PostalAddress',addressLocality:'San Miguel de Allende',addressRegion:'Guanajuato',postalCode:'37700',addressCountry:'MX'}}).replace(/</g,'\\u003c')}</script>`;
 const homeLinks = '<nav aria-label="San Miguel de Allende real estate guides" style="max-width:1200px;margin:0 auto 2rem;padding:0 1rem"><a href="/san-miguel-de-allende-real-estate">San Miguel Real Estate</a> · <a href="/san-miguel-de-allende-houses-for-sale">Houses for Sale</a> · <a href="/san-miguel-de-allende-rentals">Rentals</a> · <a href="/buying-a-home-in-san-miguel-de-allende">Buying a Home</a> · <a href="/centro-san-miguel-de-allende-real-estate">Centro Real Estate</a> · <a href="/buying-san-miguel-de-allende">Buying Guide</a> · <a href="/selling-san-miguel-de-allende">Selling Guide</a> · <a href="/relocating-to-san-miguel-de-allende">Relocation Guide</a> · <a href="/neighborhoods">Neighborhoods</a></nav>';
 
-const allowedOrigins = (process.env.ALLOWED_ORIGIN || SITE_URL)
-  .split(',')
-  .map(origin => origin.trim())
-  .filter(Boolean);
-
+const allowedOrigins = (process.env.ALLOWED_ORIGIN || SITE_URL).split(',').map(origin => origin.trim()).filter(Boolean);
 app.set('trust proxy', 1);
-
-app.use(cors({
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Origin not allowed'));
-  }
-}));
+app.use(cors({ origin(origin, callback) { if (!origin || allowedOrigins.includes(origin)) return callback(null, true); return callback(new Error('Origin not allowed')); } }));
 app.use((req, res, next) => {
-  res.set({
-    'X-Content-Type-Options': 'nosniff',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'X-Frame-Options': 'SAMEORIGIN',
-    'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
-  });
-  if (req.path.startsWith('/api/') || req.path === '/admin' || req.path.startsWith('/admin/')) {
-    res.set('X-Robots-Tag', 'noindex, nofollow');
-  }
+  res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','X-Frame-Options':'SAMEORIGIN','Permissions-Policy':'geolocation=(), microphone=(), camera=()','Strict-Transport-Security':'max-age=31536000; includeSubDomains'});
+  if (req.path.startsWith('/api/') || req.path === '/admin' || req.path.startsWith('/admin/')) res.set('X-Robots-Tag','noindex, nofollow');
   next();
 });
-app.use('/api/guide-request', express.json({ limit: '10kb' }));
-app.use('/api/property-inquiry', express.json({ limit: '10kb' }));
-app.use('/api/lead-request', express.json({ limit: '20kb' }));
-app.use('/api/admin', express.json({ limit: ADMIN_BODY_LIMIT }));
-app.use('/guides', express.static(path.join(__dirname, 'public', 'guides')));
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use('/api/guide-request', express.json({ limit:'10kb' }));
+app.use('/api/property-inquiry', express.json({ limit:'10kb' }));
+app.use('/api/lead-request', express.json({ limit:'20kb' }));
+app.use('/api/admin', express.json({ limit:ADMIN_BODY_LIMIT }));
+app.use('/guides', express.static(path.join(__dirname,'public','guides')));
+app.use('/uploads', express.static(path.join(__dirname,'public','uploads')));
+app.use('/admin', express.static(path.join(__dirname,'admin')));
 app.use('/api', guideRequestRoute);
 app.use('/api', propertiesRoute);
 app.use('/api', leadsRoute);
@@ -63,24 +46,17 @@ app.use('/', seoPagesRoute);
 app.use('/', seoGrowthRoute);
 
 app.get('/', (req, res, next) => {
-  fs.readFile(homeFile, 'utf8', (error, html) => {
+  fs.readFile(homeFile,'utf8',(error,html)=>{
     if (error) return next(error);
     res.set('Link', `<${SITE_URL}/>; rel="canonical"`);
-    let optimized = html
-      .replace(/<title>[^<]*<\/title>/i, `<title>${homeTitle}</title>`)
-      .replace(/<meta\s+name=["']description["'][^>]*>/i, `<meta name="description" content="${homeDescription}">`)
-      .replace(/<\/head>/i, `${homeMetadata}</head>`);
-    optimized = optimized.replace(/<\/body>/i, `${homeLinks}</body>`);
+    let optimized = html.replace(/<title>[^<]*<\/title>/i,`<title>${homeTitle}</title>`).replace(/<meta\s+name=["']description["'][^>]*>/i,`<meta name="description" content="${homeDescription}">`).replace(/<\/head>/i,`${homeMetadata}</head>`);
+    optimized = optimized.replace(/\+1 \(555\) 123-4567/g,'Contact through the consultation form').replace(/blaze@sanmiguelrealty\.example/g,'Use the consultation form to get in touch').replace(/Property Photo Placeholder/g,'Property photo').replace(/Placeholder — photography of [^<]+/g,'');
+    optimized = optimized.replace(/<\/body>/i,`${homeLinks}</body>`);
     res.type('html').send(optimized);
   });
 });
-app.get('/health', (req, res) => res.json({ ok: true }));
-app.post('/api/internal/run-nurture', async (req, res) => {
-  const key = req.headers['x-internal-key'];
-  if (!process.env.INTERNAL_CRON_KEY || key !== process.env.INTERNAL_CRON_KEY) return res.status(401).json({ ok:false, error:'Not authorized.' });
-  try { res.json({ ok:true, ...(await runNurtureBatch()) }); }
-  catch (error) { console.error('[internal/run-nurture] failed:', error); res.status(500).json({ ok:false, error:error.message }); }
-});
-app.use((req, res) => res.status(404).type('text/plain').send('Not found'));
-app.use((error, req, res, next) => { console.error('[server] Unhandled error:', error); res.status(500).json({ ok:false, error:'Internal server error.' }); });
-app.listen(PORT, () => console.log(`SMA lead backend listening on port ${PORT}`));
+app.get('/health',(req,res)=>res.json({ok:true}));
+app.post('/api/internal/run-nurture',async(req,res)=>{const key=req.headers['x-internal-key'];if(!process.env.INTERNAL_CRON_KEY||key!==process.env.INTERNAL_CRON_KEY)return res.status(401).json({ok:false,error:'Not authorized.'});try{res.json({ok:true,...(await runNurtureBatch())});}catch(error){console.error('[internal/run-nurture] failed:',error);res.status(500).json({ok:false,error:'Internal nurture error.'});}});
+app.use((req,res)=>{res.set('X-Robots-Tag','noindex, follow');res.status(404).type('text/html').send('<!doctype html><html lang="en"><head><meta name="robots" content="noindex,follow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page Not Found | WithBeasley</title></head><body><main><h1>Page not found</h1><p><a href="/">Return to WithBeasley</a></p></main></body></html>');});
+app.use((error,req,res,next)=>{console.error('[server] Unhandled error:',error);res.status(500).json({ok:false,error:'Internal server error.'});});
+app.listen(PORT,()=>console.log(`SMA lead backend listening on port ${PORT}`));
