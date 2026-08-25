@@ -1,6 +1,6 @@
 const express = require('express');
 const propertiesDb = require('../lib/properties-db');
-const { SITE_URL, propertyUrl, generateSeoTitle, generateMetaDescription, generateOgTags, generateStructuredData } = require('../lib/seo');
+const { SITE_URL, propertyUrl, generateSeoTitle, generateMetaDescription, generateOgTags, generateStructuredData, generateBreadcrumbs } = require('../lib/seo');
 const router = express.Router();
 const escape = value => String(value || '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
 
@@ -16,9 +16,16 @@ router.get('/properties/:slug', async (req, res, next) => {
     const p = await propertiesDb.getPropertyBySlug(req.params.slug);
     if (!p || p.archived) return res.status(404).send(page({ title:'Property Not Found | Blaze Beasley', description:'Browse San Miguel de Allende real estate with Blaze Beasley.', canonical:`${SITE_URL}/properties/${encodeURIComponent(req.params.slug)}`, noindex:true }, '<h1>Property not found</h1><p><a href="/#listings">Browse available properties</a></p>'));
     const indexable = ['for_sale', 'for_rent'].includes(p.status);
-    const images = (p.images || []).filter(i => i.url).slice(0, 20).map((i,n) => `<img src="${escape(i.url)}" alt="${escape(i.alt || `${p.title} photo ${n + 1}`)}" loading="${n ? 'lazy' : 'eager'}">`).join('');
+    const images = (p.images || []).filter(i => i.url).slice(0, 20).map((i,n) => `<img src="${escape(i.url)}" alt="${escape(i.alt || `${p.title} photo ${n + 1}`)}" loading="${n ? 'lazy' : 'eager'}" decoding="async">`).join('');
     const facts = [p.property_type, p.neighborhood, p.bedrooms && `${p.bedrooms} bedrooms`, p.bathrooms && `${p.bathrooms} bathrooms`].filter(Boolean).map(escape).join(' · ');
-    res.send(page({ title:p.seo_title || generateSeoTitle(p), description:p.meta_description || generateMetaDescription(p), canonical:propertyUrl(p.slug), og:generateOgTags(p), noindex:!indexable, schema:indexable ? generateStructuredData(p) : undefined }, `<article><p><a href="/#listings">Properties</a>${p.neighborhood ? ` / <a href="/neighborhoods">${escape(p.neighborhood)}</a>` : ''}</p><h1>${escape(p.title)}</h1>${facts ? `<p>${facts}</p>` : ''}${p.price ? `<p>${escape(p.currency === 'MXN' ? 'MXN $' : '$')}${escape(Number(p.price).toLocaleString('en-US'))}</p>` : ''}${images ? `<section aria-label="Property photos">${images}</section>` : ''}${p.luxury_description || p.short_description ? `<section><h2>About this property</h2><p>${escape(p.luxury_description || p.short_description)}</p></section>` : ''}<section><h2>Explore San Miguel de Allende real estate</h2><p><a href="/#contact">Request a private consultation</a> or <a href="/#listings">browse available properties</a>.</p></section></article>`));
+    const breadcrumbs = generateBreadcrumbs(p).map((item, index) => ({ '@type':'ListItem', position:index + 1, name:item.name, item:item.url }));
+    const listingSchema = generateStructuredData(p);
+    delete listingSchema['@context'];
+    const schema = indexable ? {
+      '@context':'https://schema.org',
+      '@graph':[listingSchema, { '@type':'BreadcrumbList', itemListElement:breadcrumbs }]
+    } : undefined;
+    res.send(page({ title:p.seo_title || generateSeoTitle(p), description:p.meta_description || generateMetaDescription(p), canonical:propertyUrl(p.slug), og:generateOgTags(p), noindex:!indexable, schema }, `<article><nav aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/#listings">Properties</a>${p.neighborhood ? ` / <a href="/neighborhoods">${escape(p.neighborhood)}</a>` : ''} / <span aria-current="page">${escape(p.title)}</span></nav><h1>${escape(p.title)}</h1>${facts ? `<p>${facts}</p>` : ''}${p.price ? `<p>${escape(p.currency === 'MXN' ? 'MXN $' : '$')}${escape(Number(p.price).toLocaleString('en-US'))}</p>` : ''}${images ? `<section aria-label="Property photos">${images}</section>` : ''}${p.luxury_description || p.short_description ? `<section><h2>About this property</h2><p>${escape(p.luxury_description || p.short_description)}</p></section>` : ''}<section><h2>Continue your San Miguel de Allende property search</h2><p>${p.neighborhood ? `<a href="/neighborhoods">Explore San Miguel neighborhoods</a>, ` : ''}<a href="/#listings">browse available properties</a>, or <a href="/#contact">request a private consultation</a>.</p></section></article>`));
   } catch (error) { next(error); }
 });
 

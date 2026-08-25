@@ -23,6 +23,18 @@ const homeMetadata = '<link rel="canonical" href="https://withbeasley.com/"><met
 const homeLinks = '<nav aria-label="San Miguel de Allende real estate guides" style="max-width:1200px;margin:0 auto 2rem;padding:0 1rem"><a href="/san-miguel-de-allende-real-estate">San Miguel Real Estate</a> · <a href="/san-miguel-de-allende-houses-for-sale">Houses for Sale</a> · <a href="/san-miguel-de-allende-rentals">Rentals</a> · <a href="/buying-a-home-in-san-miguel-de-allende">Buying a Home</a> · <a href="/centro-san-miguel-de-allende-real-estate">Centro Real Estate</a> · <a href="/buying-san-miguel-de-allende">Buying Guide</a> · <a href="/selling-san-miguel-de-allende">Selling Guide</a> · <a href="/relocating-to-san-miguel-de-allende">Relocation Guide</a> · <a href="/neighborhoods">Neighborhoods</a></nav>';
 
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
+app.use((req, res, next) => {
+  res.set({
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'X-Frame-Options': 'SAMEORIGIN',
+    'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
+  });
+  if (req.path.startsWith('/api/') || req.path === '/admin' || req.path.startsWith('/admin/')) {
+    res.set('X-Robots-Tag', 'noindex, nofollow');
+  }
+  next();
+});
 app.use('/api/guide-request', express.json({ limit: '10kb' }));
 app.use('/api/property-inquiry', express.json({ limit: '10kb' }));
 app.use('/api/lead-request', express.json({ limit: '20kb' }));
@@ -57,5 +69,6 @@ app.post('/api/internal/run-nurture', async (req, res) => {
   try { res.json({ ok:true, ...(await runNurtureBatch()) }); }
   catch (error) { console.error('[internal/run-nurture] failed:', error); res.status(500).json({ ok:false, error:error.message }); }
 });
+app.use((req, res) => res.status(404).type('text/plain').send('Not found'));
 app.use((error, req, res, next) => { console.error('[server] Unhandled error:', error); res.status(500).json({ ok:false, error:'Internal server error.' }); });
 app.listen(PORT, () => console.log(`SMA lead backend listening on port ${PORT}`));

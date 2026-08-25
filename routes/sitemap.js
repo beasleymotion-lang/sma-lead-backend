@@ -5,16 +5,13 @@ const router = express.Router();
 
 const xml = value => String(value).replace(/[<>&'\"]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;', "'":'&apos;', '\"':'&quot;' })[c]);
 
-router.get('/robots.txt', (req, res) => res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/admin\nDisallow: /api/internal\nSitemap: ${SITE_URL}/sitemap.xml\n`));
+router.get('/robots.txt', (req, res) => res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: ${SITE_URL}/sitemap.xml\n`));
 
 router.get('/sitemap.xml', async (req, res, next) => {
   try {
     const properties = await propertiesDb.listProperties({ sort: 'newest' });
     const staticPaths = [
       '/',
-      '/san-miguel-de-allende-real-estate',
-      '/san-miguel-de-allende-houses-for-sale',
-      '/san-miguel-de-allende-rentals',
       '/san-miguel-de-allende-real-estate',
       '/san-miguel-de-allende-houses-for-sale',
       '/san-miguel-de-allende-rentals',
