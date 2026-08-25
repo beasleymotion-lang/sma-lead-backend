@@ -12,6 +12,7 @@
     "dev": "node server.js",
     "test": "npm run test:smoke",
     "test:smoke": "node scripts/smoke-test.js",
+    "test:syntax": "node --check server.js && node --check routes/sitemap.js && node --check routes/seo-pages.js && node --check routes/seo-growth.js && node --check scripts/smoke-test.js",
     "guides:build": "python3 guides-src/build_guides.py",
     "guides:validate": "python3 guides-src/validate_guides.py"
   },
@@ -27,3 +28,4 @@
   },
   "engines": { "node": ">=18" }
 }
+

@@ -27,6 +27,21 @@ npm run init-db
 npm start                   # http://localhost:3001
 ```
 
+## Release checks
+
+Run these before deployment:
+
+```bash
+npm ci
+npm run test:syntax
+npm run test:smoke
+npm audit --omit=dev --audit-level=high
+```
+
+GitHub Actions runs the same verification on pull requests and pushes to `main`.
+
+For production, `ALLOWED_ORIGIN` defaults to `SITE_URL`; use a comma-separated allowlist only for additional approved frontend domains. Never use `*`. `ADMIN_PASSWORD` is required for admin login and must be a long, unique secret.
+
 Test it:
 ```bash
 curl -X POST http://localhost:3001/api/guide-request \
@@ -189,3 +204,4 @@ sma-backend/
     uploads/                     Property photos land here (created automatically)
   .env.example                   All required environment variables
 ```
+

@@ -22,7 +22,18 @@ const homeDescription = 'Explore San Miguel de Allende real estate, homes for sa
 const homeMetadata = '<link rel="canonical" href="https://withbeasley.com/"><meta name="robots" content="index,follow,max-image-preview:large"><meta property="og:url" content="https://withbeasley.com/"><meta property="og:site_name" content="WithBeasley"><meta property="og:title" content="San Miguel de Allende Real Estate | WithBeasley"><meta property="og:description" content="Explore San Miguel de Allende real estate, homes for sale and rent, neighborhoods, and relocation resources with WithBeasley."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="San Miguel de Allende Real Estate | WithBeasley"><meta name="twitter:description" content="Explore San Miguel de Allende real estate, homes for sale and rent, neighborhoods, and relocation resources with WithBeasley."><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"WithBeasley","url":"https://withbeasley.com/","description":"San Miguel de Allende real estate, homes, properties and relocation guidance.","inLanguage":"en-US"}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"WithBeasley","url":"https://withbeasley.com/"}</script>';
 const homeLinks = '<nav aria-label="San Miguel de Allende real estate guides" style="max-width:1200px;margin:0 auto 2rem;padding:0 1rem"><a href="/san-miguel-de-allende-real-estate">San Miguel Real Estate</a> · <a href="/san-miguel-de-allende-houses-for-sale">Houses for Sale</a> · <a href="/san-miguel-de-allende-rentals">Rentals</a> · <a href="/buying-a-home-in-san-miguel-de-allende">Buying a Home</a> · <a href="/centro-san-miguel-de-allende-real-estate">Centro Real Estate</a> · <a href="/buying-san-miguel-de-allende">Buying Guide</a> · <a href="/selling-san-miguel-de-allende">Selling Guide</a> · <a href="/relocating-to-san-miguel-de-allende">Relocation Guide</a> · <a href="/neighborhoods">Neighborhoods</a></nav>';
 
-app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
+const allowedOrigins = (process.env.ALLOWED_ORIGIN || SITE_URL)
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin(origin, callback) {
+    // Server-to-server requests and same-origin browser requests may not send Origin.
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Origin not allowed'));
+  }
+}));
 app.use((req, res, next) => {
   res.set({
     'X-Content-Type-Options': 'nosniff',
@@ -72,3 +83,4 @@ app.post('/api/internal/run-nurture', async (req, res) => {
 app.use((req, res) => res.status(404).type('text/plain').send('Not found'));
 app.use((error, req, res, next) => { console.error('[server] Unhandled error:', error); res.status(500).json({ ok:false, error:'Internal server error.' }); });
 app.listen(PORT, () => console.log(`SMA lead backend listening on port ${PORT}`));
+
