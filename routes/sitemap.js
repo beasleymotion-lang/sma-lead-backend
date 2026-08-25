@@ -3,7 +3,7 @@ const propertiesDb = require('../lib/properties-db');
 const { SITE_URL, propertyUrl } = require('../lib/seo');
 const router = express.Router();
 
-const xml = value => String(value).replace(/[<>&'"]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;', "'":'&apos;', '"':'&quot;' })[c]);
+const xml = value => String(value).replace(/[<>&'\"]/g, c => ({ '<':'&lt;', '>':'&gt;', '&':'&amp;', "'":'&apos;', '\"':'&quot;' })[c]);
 
 router.get('/robots.txt', (req, res) => res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/admin\nDisallow: /api/internal\nSitemap: ${SITE_URL}/sitemap.xml\n`));
 
@@ -15,6 +15,10 @@ router.get('/sitemap.xml', async (req, res, next) => {
       '/buying-san-miguel-de-allende',
       '/selling-san-miguel-de-allende',
       '/relocating-to-san-miguel-de-allende',
+      '/moving-to-san-miguel-de-allende',
+      '/homes-for-sale-san-miguel-de-allende',
+      '/homes-for-rent-san-miguel-de-allende',
+      '/luxury-real-estate-san-miguel-de-allende',
       '/neighborhoods',
       '/neighborhoods/guadalupe',
       '/neighborhoods/la-lejona',
