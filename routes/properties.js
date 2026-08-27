@@ -6,7 +6,8 @@ const {
   autofillSeoFields,
   generateStructuredData,
   generateOgTags,
-  generateBreadcrumbs
+  generateBreadcrumbs,
+  generatePropertyKeywords
 } = require('../lib/seo');
 
 const { saveImages, deleteImage } = require('../lib/image-store');
@@ -72,7 +73,8 @@ router.get('/properties/:slug', async (req, res) => {
         metaDescription: property.meta_description,
         og: generateOgTags(property),
         structuredData: generateStructuredData(property),
-        breadcrumbs: generateBreadcrumbs(property)
+        breadcrumbs: generateBreadcrumbs(property),
+        keywords: generatePropertyKeywords(property)
       }
     });
   } catch (err) {
