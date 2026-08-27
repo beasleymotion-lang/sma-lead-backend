@@ -24,7 +24,6 @@ router.get('/sitemap.xml', async (req, res, next) => {
       '/san-antonio-san-miguel-de-allende-real-estate',
       '/guadiana-san-miguel-de-allende-real-estate',
       '/buying-a-home-in-san-miguel-de-allende',
-      '/selling-san-miguel-de-allende',
       '/moving-to-san-miguel-de-allende',
       '/neighborhoods',
       '/neighborhoods/guadalupe',
@@ -32,7 +31,6 @@ router.get('/sitemap.xml', async (req, res, next) => {
       '/neighborhoods/los-senderos',
       '/neighborhoods/malanquin',
       '/neighborhoods/ojo-de-agua',
-      '/neighborhoods/zirandaro'
     ].filter((path, index, paths) => paths.indexOf(path) === index);
 
     const pages = staticPaths.map(path => ({
