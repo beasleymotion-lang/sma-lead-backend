@@ -49,6 +49,16 @@ const neighborhoodPages = {
   '/neighborhoods/zirandaro':['Zirándaro San Miguel de Allende Real Estate | WithBeasley','Explore homes and real estate in Zirándaro, San Miguel de Allende, and compare current property opportunities.','Zirándaro real estate in San Miguel de Allende']
 };
 
+
+// Core search-intent landing page.
+router.get('/san-miguel-de-allende-real-estate', (req,res) => {
+  const title='San Miguel de Allende Real Estate | WithBeasley';
+  const description='Explore San Miguel de Allende real estate with guides to neighborhoods, homes for sale, rentals, and focused property-search planning.';
+  const canonical=SITE_URL + '/san-miguel-de-allende-real-estate';
+  const body='<p>San Miguel de Allende real estate ranges from historic homes near Centro to contemporary residences and communities outside the historic core. A useful search starts with how you want to live, not simply a price range.</p><h2>Understand the areas before narrowing the search</h2><p>Walkability, terrain, views, outdoor space, parking, privacy, and proximity to Centro can all shape daily life. Compare several areas before deciding where to focus.</p><h2>Homes for sale and homes for rent</h2><p>Some people begin with a rental to experience the city, while others arrive ready to explore ownership. Browse <a href="/homes-for-sale-san-miguel-de-allende">homes for sale</a> and <a href="/homes-for-rent-san-miguel-de-allende">homes for rent</a> based on your timeline.</p><h2>Make your property search more focused</h2><p>Prepare a shortlist of your budget, ideal property type, preferred number of bedrooms, must-have features, and acceptable neighborhoods. For legal, tax, title, or financial matters, use appropriately qualified professionals.</p><p><a href="/#listings">Browse current properties</a> · <a href="/neighborhoods">Explore neighborhoods</a> · <a href="/buying-a-home-in-san-miguel-de-allende">Read the buying guide</a>.</p>';
+  res.send(page({title,description,canonical,og:{'og:title':title,'og:description':description,'og:type':'website','og:url':canonical,'og:site_name':'WithBeasley','twitter:card':'summary','twitter:title':title,'twitter:description':description},schema:seoSchema('San Miguel de Allende Real Estate',description,canonical,['San Miguel de Allende Real Estate'])},'<article><h1>San Miguel de Allende Real Estate</h1>'+body+'</article>'));
+});
+
 Object.entries(guides).forEach(([path, [title, description, heading, body]]) => router.get(path, (req,res) => {
   const canonical = SITE_URL + path;
   res.send(page({ title, description, canonical, og:{ 'og:title':title, 'og:description':description, 'og:type':'website', 'og:url':canonical, 'og:site_name':'WithBeasley', 'og:locale':'en_US', 'twitter:card':'summary', 'twitter:title':title, 'twitter:description':description }, schema:seoSchema(heading, description, canonical, [heading]) }, `<article><h1>${heading}</h1>${body}<p><a href="/#contact">Start a private consultation</a></p></article>`));
