@@ -31,6 +31,7 @@ router.get('/sitemap.xml', async (req, res, next) => {
       '/neighborhoods/los-senderos',
       '/neighborhoods/malanquin',
       '/neighborhoods/ojo-de-agua',
+      '/neighborhoods/zirandaro',
     ].filter((path, index, paths) => paths.indexOf(path) === index);
 
     const pages = staticPaths.map(path => ({
