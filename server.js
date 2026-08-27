@@ -11,7 +11,8 @@ const seoPagesRoute = require('./routes/seo-pages');
 const seoGrowthRoute = require('./routes/seo-growth');
 const adminAuthRoute = require('./routes/admin-auth');
 const { runNurtureBatch } = require('./lib/nurture-runner');
-const { SITE_URL } = require('./lib/seo');
+const { SITE_URL, generateOgTags, generateStructuredData, generateBreadcrumbs } = require('./lib/seo');
+const propertiesDb = require('./lib/properties-db');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -76,6 +77,34 @@ app.get('/', (req, res, next) => {
     res.type('html').send(optimized);
   });
 });
+app.get('/properties/:slug', async (req, res, next) => {
+  try {
+    const property = await propertiesDb.getPropertyBySlug(req.params.slug);
+    if (!property || property.archived) return next();
+    const title = property.seo_title || property.title || 'Property in San Miguel de Allende | WithBeasley';
+    const description = property.meta_description || '';
+    const og = generateOgTags(property);
+    const structuredData = generateStructuredData(property);
+    const breadcrumbs = {
+      '@context':'https://schema.org',
+      '@type':'BreadcrumbList',
+      itemListElement: generateBreadcrumbs(property).map((item, index) => ({
+        '@type':'ListItem', position:index + 1, name:item.name, item:item.url
+      }))
+    };
+    const image = og['og:image'] || '';
+    const propertyFacts = [
+      property.property_type,
+      property.bedrooms ? `${property.bedrooms} bedrooms` : '',
+      property.bathrooms ? `${property.bathrooms} bathrooms` : '',
+      property.neighborhood
+    ].filter(Boolean).join(' · ');
+    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${description.replace(/"/g,'&quot;')}"><link rel="canonical" href="${SITE_URL}/properties/${encodeURIComponent(property.slug)}"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1"><meta property="og:type" content="website"><meta property="og:url" content="${og['og:url']}"><meta property="og:site_name" content="WithBeasley"><meta property="og:title" content="${og['og:title']}"><meta property="og:description" content="${og['og:description']}">${image ? `<meta property="og:image" content="${image}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${image}">` : '<meta name="twitter:card" content="summary">'}<script type="application/ld+json">${JSON.stringify(structuredData).replace(/</g,'\\u003c')}</script><script type="application/ld+json">${JSON.stringify(breadcrumbs).replace(/</g,'\\u003c')}</script></head><body><main><p><a href="/">WithBeasley</a> · <a href="/homes-for-sale-san-miguel-de-allende">Properties</a></p><article><h1>${property.title}</h1>${propertyFacts ? `<p>${propertyFacts}</p>` : ''}${image ? `<img src="${image}" alt="${property.title}" style="max-width:100%;height:auto">` : ''}${property.short_description ? `<p>${property.short_description}</p>` : ''}${property.description ? `<section><h2>About this property</h2><p>${String(property.description).replace(/\n/g,'<br>')}</p></section>` : ''}<p><a href="/#contact">Ask about this property</a></p></article></main></body></html>`;
+    res.set({'Link': `<${SITE_URL}/properties/${encodeURIComponent(property.slug)}>; rel="canonical"`, 'Cache-Control':'public, max-age=300, s-maxage=300'});
+    res.type('html').send(html);
+  } catch (error) { next(error); }
+});
+
 app.get('/health',(req,res)=>res.json({ok:true}));
 app.post('/api/internal/run-nurture',async(req,res)=>{const key=req.headers['x-internal-key'];if(!process.env.INTERNAL_CRON_KEY||key!==process.env.INTERNAL_CRON_KEY)return res.status(401).json({ok:false,error:'Not authorized.'});try{res.json({ok:true,...(await runNurtureBatch())});}catch(error){console.error('[internal/run-nurture] failed:',error);res.status(500).json({ok:false,error:'Internal nurture error.'});}});
 app.use((req,res)=>{res.set('X-Robots-Tag','noindex, follow');res.status(404).type('text/html').send('<!doctype html><html lang="en"><head><meta name="robots" content="noindex,follow"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page Not Found | WithBeasley</title></head><body><main><h1>Page not found</h1><p><a href="/">Return to WithBeasley</a></p></main></body></html>');});
