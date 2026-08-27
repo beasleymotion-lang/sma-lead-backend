@@ -24,6 +24,7 @@ router.get('/sitemap.xml', async (req, res, next) => {
       '/san-antonio-san-miguel-de-allende-real-estate',
       '/guadiana-san-miguel-de-allende-real-estate',
       '/buying-a-home-in-san-miguel-de-allende',
+      '/selling-a-home-in-san-miguel-de-allende',
       '/moving-to-san-miguel-de-allende',
       '/neighborhoods',
       '/neighborhoods/guadalupe',
