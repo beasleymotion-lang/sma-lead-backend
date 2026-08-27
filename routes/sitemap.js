@@ -17,8 +17,6 @@ router.get('/sitemap.xml', async (req, res, next) => {
     const staticPaths = [
       '/',
       '/san-miguel-de-allende-real-estate',
-      '/san-miguel-de-allende-houses-for-sale',
-      '/san-miguel-de-allende-rentals',
       '/homes-for-sale-san-miguel-de-allende',
       '/homes-for-rent-san-miguel-de-allende',
       '/luxury-real-estate-san-miguel-de-allende',
@@ -26,9 +24,7 @@ router.get('/sitemap.xml', async (req, res, next) => {
       '/san-antonio-san-miguel-de-allende-real-estate',
       '/guadiana-san-miguel-de-allende-real-estate',
       '/buying-a-home-in-san-miguel-de-allende',
-      '/buying-san-miguel-de-allende',
       '/selling-san-miguel-de-allende',
-      '/relocating-to-san-miguel-de-allende',
       '/moving-to-san-miguel-de-allende',
       '/neighborhoods',
       '/neighborhoods/guadalupe',
