@@ -25,12 +25,12 @@ const page = ({ title, description, path, heading, intro, sections, related = []
       ]
     }
   ];
-  return `<!doctype html><html lang="en"><head><title>${escape(title)}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${escape(canonical)}"><meta name="robots" content="index,follow,max-image-preview:large"><meta name="viewport" content="width=device-width,initial-scale=1"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website"><meta property="og:url" content="${escape(canonical)}"><meta property="og:site_name" content="Blaze Beasley Real Estate"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="${escape(title)}"><meta name="twitter:description" content="${escape(description)}">${schema.map(item => `<script type="application/ld+json">${JSON.stringify(item).replace(/</g, '\\u003c')}</script>`).join('')}</head><body><header><a href="/">Blaze Beasley</a><nav aria-label="Primary"><a href="/#listings">Properties</a> <a href="/homes-for-sale-san-miguel-de-allende">Homes for Sale</a> <a href="/homes-for-rent-san-miguel-de-allende">Homes for Rent</a> <a href="/neighborhoods">Neighborhoods</a> <a href="/moving-to-san-miguel-de-allende">Moving to San Miguel</a></nav></header><main><article><p><a href="/">Home</a> / San Miguel de Allende</p><h1>${escape(heading)}</h1><p>${escape(intro)}</p>${sections.map(s => `<section><h2>${escape(s.h2)}</h2><p>${escape(s.body)}</p></section>`).join('')}<section><h2>Explore WithBeasley</h2><p><a href="/#listings">Browse current properties</a> · <a href="/homes-for-sale-san-miguel-de-allende">Homes for sale</a> · <a href="/homes-for-rent-san-miguel-de-allende">Homes for rent</a> · <a href="/neighborhoods">Neighborhood guide</a> · <a href="/#contact">Start a focused search</a></p>${related.length ? `<p>Related: ${related.map(r => `<a href="${escape(r.path)}">${escape(r.label)}</a>`).join(' · ')}</p>` : ''}</section></article></main><footer><p>Blaze Beasley · San Miguel de Allende, Guanajuato, Mexico</p></footer></body></html>`;
+  return `<!doctype html><html lang="en"><head><title>${escape(title)}</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${escape(canonical)}"><meta name="robots" content="index,follow,max-image-preview:large"><meta name="viewport" content="width=device-width,initial-scale=1"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="website"><meta property="og:url" content="${escape(canonical)}"><meta property="og:site_name" content="WithBeasley"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="${escape(title)}"><meta name="twitter:description" content="${escape(description)}">${schema.map(item => `<script type="application/ld+json">${JSON.stringify(item).replace(/</g, '\\u003c')}</script>`).join('')}</head><body><header><a href="/">WithBeasley</a><nav aria-label="Primary"><a href="/#listings">Properties</a> <a href="/homes-for-sale-san-miguel-de-allende">Homes for Sale</a> <a href="/homes-for-rent-san-miguel-de-allende">Homes for Rent</a> <a href="/neighborhoods">Neighborhoods</a> <a href="/moving-to-san-miguel-de-allende">Moving to San Miguel</a></nav></header><main><article><p><a href="/">Home</a> / San Miguel de Allende</p><h1>${escape(heading)}</h1><p>${escape(intro)}</p>${sections.map(s => `<section><h2>${escape(s.h2)}</h2><p>${escape(s.body)}</p></section>`).join('')}<section><h2>Explore WithBeasley</h2><p><a href="/#listings">Browse current properties</a> · <a href="/homes-for-sale-san-miguel-de-allende">Homes for sale</a> · <a href="/homes-for-rent-san-miguel-de-allende">Homes for rent</a> · <a href="/neighborhoods">Neighborhood guide</a> · <a href="/#contact">Start a focused search</a></p>${related.length ? `<p>Related: ${related.map(r => `<a href="${escape(r.path)}">${escape(r.label)}</a>`).join(' · ')}</p>` : ''}</section></article></main><footer><p>Blaze Beasley · San Miguel de Allende, Guanajuato, Mexico</p></footer></body></html>`;
 };
 
 const pages = {
   '/san-miguel-de-allende-real-estate': {
-    title: 'San Miguel de Allende Real Estate | Homes & Properties | Blaze Beasley',
+    title: 'San Miguel de Allende Real Estate | Homes & Properties | WithBeasley',
     description: 'Explore San Miguel de Allende real estate, homes, rentals, neighborhoods, and current property opportunities with Blaze Beasley.',
     heading: 'San Miguel de Allende Real Estate',
     intro: 'Explore homes and properties in San Miguel de Allende with a search organized around the neighborhoods, lifestyle, budget, and property features that matter to you.',
@@ -41,7 +41,7 @@ const pages = {
     ]
   },
   '/san-miguel-de-allende-houses-for-sale': {
-    title: 'San Miguel de Allende Houses for Sale | Blaze Beasley',
+    title: 'San Miguel de Allende Houses for Sale | WithBeasley',
     description: 'Browse houses for sale in San Miguel de Allende and narrow your search by neighborhood, property type, size, price, and lifestyle needs.',
     heading: 'Houses for Sale in San Miguel de Allende',
     intro: 'Looking for a house for sale in San Miguel de Allende? Start with the location and lifestyle you want, then compare current homes against your priorities.',
@@ -52,7 +52,7 @@ const pages = {
     ]
   },
   '/san-miguel-de-allende-rentals': {
-    title: 'San Miguel de Allende Rentals | Homes for Rent | Blaze Beasley',
+    title: 'San Miguel de Allende Rentals | Homes for Rent | WithBeasley',
     description: 'Explore San Miguel de Allende rentals and homes for rent by neighborhood, budget, timing, and the features you need for your stay.',
     heading: 'San Miguel de Allende Rentals',
     intro: 'Find a rental in San Miguel de Allende by starting with the neighborhood, length of stay, budget, furnishing needs, and daily routine that fit your plans.',
@@ -63,7 +63,7 @@ const pages = {
     ]
   },
   '/centro-san-miguel-de-allende-real-estate': {
-    title: 'Centro San Miguel de Allende Real Estate | Blaze Beasley',
+    title: 'Centro San Miguel de Allende Real Estate | WithBeasley',
     description: 'Explore real estate in Centro San Miguel de Allende and compare current homes and properties with a focused local search.',
     heading: 'Centro San Miguel de Allende Real Estate',
     intro: 'Centro is one of the most recognizable areas of San Miguel de Allende. Explore current property opportunities and decide whether the central setting fits the way you want to live.',
@@ -75,7 +75,7 @@ const pages = {
     related: [{ path: '/neighborhoods/guadalupe', label: 'Guadalupe real estate' }, { path: '/neighborhoods/ojo-de-agua', label: 'Ojo de Agua real estate' }]
   },
   '/san-antonio-san-miguel-de-allende-real-estate': {
-    title: 'San Antonio San Miguel de Allende Real Estate | Blaze Beasley',
+    title: 'San Antonio San Miguel de Allende Real Estate | WithBeasley',
     description: 'Explore homes and real estate in San Antonio, San Miguel de Allende, and compare current properties with a focused search.',
     heading: 'San Antonio San Miguel de Allende Real Estate',
     intro: 'Explore property opportunities around San Antonio and compare homes based on the setting, space, budget, and lifestyle you want.',
@@ -86,7 +86,7 @@ const pages = {
     ]
   },
   '/guadiana-san-miguel-de-allende-real-estate': {
-    title: 'Guadiana San Miguel de Allende Real Estate | Blaze Beasley',
+    title: 'Guadiana San Miguel de Allende Real Estate | WithBeasley',
     description: 'Explore homes and real estate in Guadiana, San Miguel de Allende, and compare current property opportunities.',
     heading: 'Guadiana San Miguel de Allende Real Estate',
     intro: 'Explore Guadiana as part of a broader San Miguel de Allende property search, then compare current homes against your lifestyle and budget.',
@@ -97,7 +97,7 @@ const pages = {
     ]
   },
   '/buying-a-home-in-san-miguel-de-allende': {
-    title: 'Buying a Home in San Miguel de Allende | Blaze Beasley',
+    title: 'Buying a Home in San Miguel de Allende | WithBeasley',
     description: 'A practical starting point for buying a home in San Miguel de Allende, from defining your search to comparing properties and next steps.',
     heading: 'Buying a Home in San Miguel de Allende',
     intro: 'Buying a home in San Miguel de Allende starts with a clear brief: where you want to live, how you will use the property, your budget, and the features that are essential.',
