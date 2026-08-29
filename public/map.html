@@ -23,7 +23,7 @@ a{color:inherit}.brand{font-weight:800;letter-spacing:.04em;text-decoration:none
 <section class="hero"><div class="tag">Interactive local guide</div><h1>Explore San Miguel.</h1><p>Browse neighborhoods and discover hotels, restaurants, cafés, and landmarks across San Miguel de Allende. Place data loads from OpenStreetMap so the guide can grow as local places are mapped.</p></section>
 <div class="controls">
 <button class="filter active" data-layer="all">Everything</button>
-<button class="filter" data-layer="neighborhood">Neighborhoods</button>
+<button class="filter" data-layer="neighborhood">Neighborhood Boundaries</button>
 <button class="filter" data-layer="hotel">Hotels</button>
 <button class="filter" data-layer="restaurant">Restaurants</button>
 <button class="filter" data-layer="cafe">Cafés</button>
@@ -32,7 +32,7 @@ a{color:inherit}.brand{font-weight:800;letter-spacing:.04em;text-decoration:none
 <div class="status" id="status">Loading local places…</div>
 <div id="map"></div>
 <section class="legend">
-<div class="card"><b>🏘 Neighborhoods</b>Explore the character and location of key areas.</div>
+<div class="card"><b>🏘 Neighborhood boundaries</b>Interactive guide boundaries. Where mapped OpenStreetMap boundaries are available, those can replace the guide outlines.</div>
 <div class="card"><b>☕ Cafés</b>Find coffee shops and places to slow down.</div>
 <div class="card"><b>🍽 Restaurants</b>Explore dining around Centro and beyond.</div>
 <div class="card"><b>🏨 Hotels</b>See boutique hotels and places to stay.</div>
@@ -42,6 +42,7 @@ a{color:inherit}.brand{font-weight:800;letter-spacing:.04em;text-decoration:none
 const map=L.map('map',{scrollWheelZoom:true}).setView([20.9145,-100.7448],14);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
 const groups={hotel:L.layerGroup().addTo(map),restaurant:L.layerGroup().addTo(map),cafe:L.layerGroup().addTo(map),landmark:L.layerGroup().addTo(map),neighborhood:L.layerGroup().addTo(map)};
+const boundaryLayer=L.layerGroup().addTo(map);
 const colors={hotel:'#8b5e3c',restaurant:'#b33b3b',cafe:'#7950a3',landmark:'#b78b4b',neighborhood:'#287b68'};
 function icon(type){return L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:'+colors[type]+';border:3px solid white;box-shadow:0 1px 6px #555"></div>',iconSize:[16,16],iconAnchor:[8,8]})}
 const neighborhoods=[
@@ -56,6 +57,27 @@ const neighborhoods=[
 ['Malanquín',20.8895,-100.7605,'Residential and golf-oriented area south of Centro.'],
 ['La Aurora',20.9230,-100.7488,'Area around Fábrica La Aurora with galleries and creative spaces.']
 ];
+const boundaryNames=neighborhoods.map(n=>n[0]);
+const manualBounds={
+ 'Centro Histórico':[[20.9202,-100.7508],[20.9208,-100.7420],[20.9178,-100.7370],[20.9108,-100.7372],[20.9078,-100.7425],[20.9098,-100.7498]],
+ 'Guadalupe':[[20.9268,-100.7585],[20.9292,-100.7500],[20.9242,-100.7440],[20.9188,-100.7465],[20.9182,-100.7538]],
+ 'San Antonio':[[20.9115,-100.7568],[20.9125,-100.7450],[20.9072,-100.7392],[20.8990,-100.7425],[20.8980,-100.7518]],
+ 'Guadiana':[[20.9120,-100.7440],[20.9105,-100.7360],[20.9060,-100.7352],[20.9042,-100.7422],[20.9078,-100.7460]],
+ 'Ojo de Agua':[[20.9085,-100.7390],[20.9062,-100.7300],[20.8990,-100.7295],[20.8970,-100.7380],[20.9030,-100.7420]],
+ 'Atascadero':[[20.9070,-100.7360],[20.9050,-100.7265],[20.8990,-100.7275],[20.8958,-100.7360],[20.9000,-100.7415]],
+ 'Balcones':[[20.9020,-100.7370],[20.8995,-100.7280],[20.8955,-100.7270],[20.8925,-100.7355],[20.8960,-100.7410]],
+ 'La Lejona':[[20.9040,-100.7730],[20.9050,-100.7560],[20.8990,-100.7505],[20.8880,-100.7540],[20.8865,-100.7685],[20.8950,-100.7760]],
+ 'Malanquín':[[20.8940,-100.7710],[20.8945,-100.7530],[20.8870,-100.7500],[20.8815,-100.7570],[20.8830,-100.7715]],
+ 'La Aurora':[[20.9295,-100.7560],[20.9300,-100.7450],[20.9220,-100.7425],[20.9190,-100.7490],[20.9225,-100.7575]]
+};
+function drawBoundary(name,coords,source='Approximate guide boundary'){
+ const poly=L.polygon(coords,{color:colors.neighborhood,weight:2,fillColor:colors.neighborhood,fillOpacity:.12});
+ poly.bindPopup('<b>'+name+'</b><br>'+source+'<br><span class="tag">Neighborhood guide</span>');
+ poly.on('mouseover',()=>poly.setStyle({fillOpacity:.25,weight:3}));
+ poly.on('mouseout',()=>poly.setStyle({fillOpacity:.12,weight:2}));
+ poly.addTo(boundaryLayer);
+}
+Object.entries(manualBounds).forEach(([name,coords])=>drawBoundary(name,coords));
 neighborhoods.forEach(([n,lat,lng,d])=>L.marker([lat,lng],{icon:icon('neighborhood')}).bindPopup('<b>'+n+'</b><br>'+d).addTo(groups.neighborhood));
 const landmarks=[
 ['Parroquia de San Miguel Arcángel',20.9145,-100.7438],
@@ -75,6 +97,15 @@ async function loadPlaces(){
  }catch(err){document.getElementById('status').textContent='Neighborhoods and landmarks are available. Live place data could not load right now.'}
 }
 loadPlaces();
-document.querySelectorAll('.filter').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const type=btn.dataset.layer;Object.entries(groups).forEach(([k,g])=>{if(type==='all'||k===type){if(!map.hasLayer(g))g.addTo(map)}else if(map.hasLayer(g))map.removeLayer(g)})});
+async function loadOfficialNeighborhoodBoundaries(){
+ const queries=boundaryNames.map(n=>'rel["name"="'+n.replace(/"/g,'')+'"]["boundary"](20.875,-100.79,20.945,-100.70);').join('');
+ const q='[out:json][timeout:30];('+queries+');out geom;';
+ try{
+  const data=await fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q)).then(r=>r.json());
+  data.elements.forEach(rel=>{const name=rel.tags&&rel.tags.name;if(!name||!rel.members)return;const lines=rel.members.filter(m=>m.geometry).map(m=>m.geometry.map(p=>[p.lat,p.lon]));if(!lines.length)return;const existing=manualBounds[name];if(existing){boundaryLayer.eachLayer(layer=>{const center=layer.getBounds&&layer.getBounds().getCenter();if(center&&center.distanceTo(L.latLng(existing[0]))<2000)boundaryLayer.removeLayer(layer);});}lines.forEach(coords=>drawBoundary(name,coords,'OpenStreetMap mapped boundary'));});
+ }catch(e){}
+}
+loadOfficialNeighborhoodBoundaries();
+document.querySelectorAll('.filter').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const type=btn.dataset.layer;Object.entries(groups).forEach(([k,g])=>{if(type==='all'||k===type){if(!map.hasLayer(g))g.addTo(map)}else if(map.hasLayer(g))map.removeLayer(g)}); if(type==='all'||type==='neighborhood'){if(!map.hasLayer(boundaryLayer))boundaryLayer.addTo(map)}else if(map.hasLayer(boundaryLayer))map.removeLayer(boundaryLayer)});
 </script>
 </body></html>
