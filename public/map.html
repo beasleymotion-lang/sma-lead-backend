@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Explore San Miguel de Allende | Interactive Map | WithBeasley</title>
+<meta name="description" content="Explore San Miguel de Allende with an interactive map of neighborhoods, hotels, restaurants, cafés, and major landmarks.">
+<link rel="canonical" href="https://withbeasley.com/map">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--ink:#17221f;--paper:#f7f3ec;--gold:#b78b4b;--line:#ded7ca}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--paper);color:var(--ink)}
+header{padding:22px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);background:#fffdf9}
+a{color:inherit}.brand{font-weight:800;letter-spacing:.04em;text-decoration:none}.hero{padding:48px 5% 26px;max-width:1100px}.hero h1{font-family:Georgia,serif;font-size:clamp(2.5rem,6vw,5rem);line-height:.98;margin:0 0 16px}.hero p{max-width:720px;font-size:1.05rem;line-height:1.6;color:#52605a}
+.controls{padding:0 5% 22px;display:flex;flex-wrap:wrap;gap:10px}.filter{border:1px solid var(--line);background:white;padding:11px 15px;border-radius:999px;cursor:pointer;font-weight:700}.filter.active{background:var(--ink);color:white;border-color:var(--ink)}
+#map{height:72vh;min-height:600px;width:90%;margin:0 auto 40px;border-radius:22px;overflow:hidden;border:1px solid var(--line)}
+.legend{max-width:1100px;margin:0 auto 45px;padding:0 5%;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.card{background:white;border:1px solid var(--line);padding:18px;border-radius:16px}.card b{display:block;margin-bottom:6px}.leaflet-popup-content{font-size:14px;line-height:1.5}.tag{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#80613a;font-weight:800}
+.status{padding:0 5% 12px;color:#66736d;font-size:.9rem}
+</style>
+</head>
+<body>
+<header><a class="brand" href="/">WITHBEASLEY</a><a href="/#contact">Get in touch</a></header>
+<section class="hero"><div class="tag">Interactive local guide</div><h1>Explore San Miguel.</h1><p>Browse neighborhoods and discover hotels, restaurants, cafés, and landmarks across San Miguel de Allende. Place data loads from OpenStreetMap so the guide can grow as local places are mapped.</p></section>
+<div class="controls">
+<button class="filter active" data-layer="all">Everything</button>
+<button class="filter" data-layer="neighborhood">Neighborhoods</button>
+<button class="filter" data-layer="hotel">Hotels</button>
+<button class="filter" data-layer="restaurant">Restaurants</button>
+<button class="filter" data-layer="cafe">Cafés</button>
+<button class="filter" data-layer="landmark">Landmarks</button>
+</div>
+<div class="status" id="status">Loading local places…</div>
+<div id="map"></div>
+<section class="legend">
+<div class="card"><b>🏘 Neighborhoods</b>Explore the character and location of key areas.</div>
+<div class="card"><b>☕ Cafés</b>Find coffee shops and places to slow down.</div>
+<div class="card"><b>🍽 Restaurants</b>Explore dining around Centro and beyond.</div>
+<div class="card"><b>🏨 Hotels</b>See boutique hotels and places to stay.</div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map=L.map('map',{scrollWheelZoom:true}).setView([20.9145,-100.7448],14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+const groups={hotel:L.layerGroup().addTo(map),restaurant:L.layerGroup().addTo(map),cafe:L.layerGroup().addTo(map),landmark:L.layerGroup().addTo(map),neighborhood:L.layerGroup().addTo(map)};
+const colors={hotel:'#8b5e3c',restaurant:'#b33b3b',cafe:'#7950a3',landmark:'#b78b4b',neighborhood:'#287b68'};
+function icon(type){return L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:'+colors[type]+';border:3px solid white;box-shadow:0 1px 6px #555"></div>',iconSize:[16,16],iconAnchor:[8,8]})}
+const neighborhoods=[
+['Centro Histórico',20.9155,-100.7446,'Historic core, walkable streets, the Jardín, landmarks, dining, and boutique hotels.'],
+['Guadalupe',20.9204,-100.7528,'Known for a creative atmosphere and street art north of Centro.'],
+['San Antonio',20.9058,-100.7486,'Residential area south of Centro with galleries, cafés, and a mix of homes.'],
+['Guadiana',20.9087,-100.7400,'Residential area close to Centro and Parque Juárez.'],
+['Ojo de Agua',20.9029,-100.7381,'Hillside residential area with views and varied terrain.'],
+['Atascadero',20.9044,-100.7351,'Residential hillside area southeast of Centro.'],
+['Balcones',20.9010,-100.7325,'Elevated residential area known for panoramic views.'],
+['La Lejona',20.8960,-100.7600,'Residential area west and southwest of the historic center.'],
+['Malanquín',20.8895,-100.7605,'Residential and golf-oriented area south of Centro.'],
+['La Aurora',20.9230,-100.7488,'Area around Fábrica La Aurora with galleries and creative spaces.']
+];
+neighborhoods.forEach(([n,lat,lng,d])=>L.marker([lat,lng],{icon:icon('neighborhood')}).bindPopup('<b>'+n+'</b><br>'+d).addTo(groups.neighborhood));
+const landmarks=[
+['Parroquia de San Miguel Arcángel',20.9145,-100.7438],
+['Jardín Allende',20.9147,-100.7446],
+['Parque Benito Juárez',20.9074,-100.7414],
+['Fábrica La Aurora',20.9237,-100.7502],
+['El Charco del Ingenio',20.9228,-100.7340]
+];
+landmarks.forEach(([n,lat,lng])=>L.marker([lat,lng],{icon:icon('landmark')}).bindPopup('<b>'+n+'</b><br><span class="tag">Landmark</span>').addTo(groups.landmark));
+async function loadPlaces(){
+ const q='[out:json][timeout:30];(node["tourism"="hotel"](20.875,-100.79,20.945,-100.70);node["amenity"="restaurant"](20.875,-100.79,20.945,-100.70);node["amenity"="cafe"](20.875,-100.79,20.945,-100.70););out center tags;';
+ const url='https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q);
+ try{
+  const data=await fetch(url).then(r=>r.json());
+  data.elements.forEach(e=>{const t=e.tags||{};let type=t.tourism==='hotel'?'hotel':t.amenity==='restaurant'?'restaurant':'cafe';if(!e.lat||!e.lon||!t.name)return;const popup='<b>'+t.name+'</b><br><span class="tag">'+type+'</span>'+(t['addr:street']?'<br>'+t['addr:street']+(t['addr:housenumber']?' '+t['addr:housenumber']:''):'')+'<br><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(t.name+' San Miguel de Allende')+'">Get directions</a>';L.marker([e.lat,e.lon],{icon:icon(type)}).bindPopup(popup).addTo(groups[type]);});
+  document.getElementById('status').textContent='Showing '+data.elements.length+' mapped hotels, restaurants, and cafés, plus neighborhood and landmark guides.';
+ }catch(err){document.getElementById('status').textContent='Neighborhoods and landmarks are available. Live place data could not load right now.'}
+}
+loadPlaces();
+document.querySelectorAll('.filter').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const type=btn.dataset.layer;Object.entries(groups).forEach(([k,g])=>{if(type==='all'||k===type){if(!map.hasLayer(g))g.addTo(map)}else if(map.hasLayer(g))map.removeLayer(g)})});
+</script>
+</body></html>
