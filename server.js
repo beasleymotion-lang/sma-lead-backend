@@ -65,7 +65,7 @@ app.use('/', seoGrowthRoute);
 app.get('/', (req, res, next) => {
   fs.readFile(homeFile,'utf8',(error,html)=>{
     if (error) return next(error);
-    res.set({'Link': `<${SITE_URL}/>; rel="canonical"`, 'Cache-Control':'public, max-age=300, s-maxage=300, stale-while-revalidate=86400'});
+    res.set({'Link': `<${SITE_URL}/>; rel="canonical"`, 'Cache-Control':'no-store, max-age=0'});
     let optimized = html
       .replace(/<title>[^<]*<\/title>/i,`<title>${homeTitle}</title>`)
       .replace(/<meta\s+name=["']description["'][^>]*>/i,`<meta name="description" content="${homeDescription}">`)
