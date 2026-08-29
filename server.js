@@ -88,6 +88,12 @@ app.get('/', (req, res, next) => {
     res.type('html').send(optimized);
   });
 });
+app.get('/map', (req, res, next) => {
+  const mapFile = path.join(__dirname, 'public', 'map.html');
+  res.set({'Link': `<${SITE_URL}/map>; rel="canonical"`, 'Cache-Control':'public, max-age=300, s-maxage=300'});
+  res.sendFile(mapFile, err => { if (err) next(err); });
+});
+
 app.get('/properties/:slug', async (req, res, next) => {
   try {
     const property = await propertiesDb.getPropertyBySlug(req.params.slug);
