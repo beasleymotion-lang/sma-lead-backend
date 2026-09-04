@@ -1,0 +1,28 @@
+name: Inspect property price rendering
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect price code
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('public/index.html').read_text(encoding='utf-8')
+          needles=['function fmtPrice','fmtPrice(','property.currency','l.currency','currency.mode','cmsPropertyToListing','renderProperty','openProperty','propertyPage','detail']
+          for needle in needles:
+              print('\n===',needle,'===')
+              start=0
+              count=0
+              while True:
+                  i=s.find(needle,start)
+                  if i<0: break
+                  print(s[max(0,i-350):min(len(s),i+700)].replace('\n',' '))
+                  start=i+len(needle); count+=1
+                  if count>=8: break
+          PY
