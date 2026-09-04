@@ -2298,7 +2298,7 @@ const icons = {
 };
 
 function fmtPrice(v, isRent, propertyCurrency){
-  const source = String(propertyCurrency || 'USD').toUpperCase();
+  const source = String(propertyCurrency || currency.mode || 'USD').toUpperCase();
   const target = currency.mode || source;
   const val = source === target ? v : (target === 'USD' ? Math.round(v/currency.rate) : Math.round(v*currency.rate));
   return '$' + val.toLocaleString('en-US') + (isRent ? '/mo' : '');
