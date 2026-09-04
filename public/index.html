@@ -2487,6 +2487,7 @@ async function loadListingsFromCMS(){
     const data = await res.json();
     if(!data.ok || !Array.isArray(data.properties)) return;
     listings = data.properties.map(cmsPropertyToListing);
+      listings.forEach((listing, i) => { listing.currency = String(data.properties[i]?.currency || listing.currency || 'USD').toUpperCase(); });
       if (listings.length && !currency.mode) {
         currency.mode = listings[0].currency || 'USD';
         document.querySelectorAll('#currency-toggle button').forEach(b=>b.classList.toggle('active', b.dataset.cur === currency.mode));
