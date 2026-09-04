@@ -1,0 +1,50 @@
+name: Patch property currency display
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch currency handling
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('public/index.html')
+          s = p.read_text(encoding='utf-8')
+          old = "const currency = { rate: 17.8, mode: 'USD' };"
+          new = old
+          old_fmt = "function fmtPrice(v, isRent){\n  const val = currency.mode === 'USD' ? v : Math.round(v*currency.rate);\n  return '$' + val.toLocaleString('en-US') + (isRent ? '/mo' : '');\n}"
+          new_fmt = "function fmtPrice(v, isRent, propertyCurrency){\n  const source = String(propertyCurrency || 'USD').toUpperCase();\n  const val = source === currency.mode ? v : (currency.mode === 'USD' ? Math.round(v/currency.rate) : Math.round(v*currency.rate));\n  return '$' + val.toLocaleString('en-US') + (isRent ? '/mo' : '');\n}"
+          old_map = "    price: p.price,\n    beds: p.bedrooms || 0,"
+          new_map = "    price: p.price,\n    currency: String(p.currency || 'USD').toUpperCase(),\n    beds: p.bedrooms || 0,"
+          replacements = [
+            (old_fmt, new_fmt),
+            (old_map, new_map),
+            ("fmtPrice(l.price, l.mode==='rent')", "fmtPrice(l.price, l.mode==='rent', l.currency)"),
+            ("fmtPrice(property.price, property.status === 'for_rent')", "fmtPrice(property.price, property.status === 'for_rent', property.currency || (l && l.currency))"),
+          ]
+          for a,b in replacements:
+            if a not in s:
+              print('Missing expected text:', a[:80])
+            else:
+              s = s.replace(a,b)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/index.html
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git commit -m "fix: honor property currency on listings"
+          git push
