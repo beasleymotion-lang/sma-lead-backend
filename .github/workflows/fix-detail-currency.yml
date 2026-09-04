@@ -13,11 +13,12 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
           p=Path('public/index.html')
           s=p.read_text(encoding='utf-8')
           original=s
 
-          # Ensure every CMS listing carries the stored currency into the normalized listing object.
+          # Every normalized CMS listing carries the stored currency.
           marker='function cmsPropertyToListing(p, idx){'
           pos=s.find(marker)
           if pos<0: raise SystemExit('cmsPropertyToListing not found')
@@ -30,14 +31,22 @@ jobs:
           if insert.strip() not in s[ret:s.find('};', ret)]:
               s=s[:line_end+1]+insert+s[line_end+1:]
 
-          # Detail API responses are authoritative; if they omit currency, inherit the listing's stored currency.
+          # API detail data inherits the exact currency already attached to the card listing.
           old="const fresh = cmsPropertyToListing(p, fallbackIndex || 0);"
-          new="const fresh = cmsPropertyToListing(p, fallbackIndex || 0);\n        fresh.currency = String(p.currency || fresh.currency || ((window.listings || listings)[fallbackIndex || 0] || {}).currency || 'USD').toUpperCase();"
+          new="const fresh = cmsPropertyToListing(p, fallbackIndex || 0);\n        fresh.currency = String(((window.listings || listings)[fallbackIndex || 0] || {}).currency || p.currency || fresh.currency || 'USD').toUpperCase();"
           if old in s and new not in s: s=s.replace(old,new,1)
 
-          # The legacy/detail renderers must pass the listing currency into the formatter too.
+          # Patch every detail/similar-property formatter that previously omitted the listing currency.
           s=s.replace("fmtPrice(l.price, l.mode==='rent')", "fmtPrice(l.price, l.mode==='rent', l.currency)")
           s=s.replace("fmtPrice(s.price, s.mode==='rent')", "fmtPrice(s.price, s.mode==='rent', s.currency)")
+          s=s.replace("fmtPrice(l.price,l.mode==='rent')", "fmtPrice(l.price,l.mode==='rent',l.currency)")
+          s=s.replace("fmtPrice(s.price,s.mode==='rent')", "fmtPrice(s.price,s.mode==='rent',s.currency)")
+          s=s.replace("fmtPrice(l.price, l.mode === 'rent')", "fmtPrice(l.price, l.mode === 'rent', l.currency)")
+          s=s.replace("fmtPrice(l.price, l.mode === 'rent', l.currency, l.currency)", "fmtPrice(l.price, l.mode === 'rent', l.currency)")
+
+          # This older detail renderer uses a local `price` variable and was the remaining source of the conversion bug.
+          s=s.replace("typeof fmtPrice==='function'?fmtPrice(l.price,l.mode==='rent')", "typeof fmtPrice==='function'?fmtPrice(l.price,l.mode==='rent',l.currency)")
+          s=s.replace("typeof fmtPrice === 'function' ? fmtPrice(l.price, l.mode === 'rent')", "typeof fmtPrice === 'function' ? fmtPrice(l.price, l.mode === 'rent', l.currency)")
 
           if s==original: raise SystemExit('No changes made; refusing to commit a no-op')
           p.write_text(s,encoding='utf-8')
@@ -47,5 +56,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/index.html
-          git commit -m "fix: preserve listing currency on property detail pages"
+          git commit -m "fix: use stored currency in all property detail prices"
           git push
