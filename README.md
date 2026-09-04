@@ -92,7 +92,7 @@ I can't deploy this myself — no internet access in the environment I built it 
    - `RESEND_API_KEY` — from resend.com after verifying a sending domain
    - `FROM_EMAIL` — e.g. `Blaze Beasley <blaze@yourdomain.com>`
    - `NOTIFY_EMAIL` — your real inbox
-   - `ADMIN_PASSWORD` — a strong password for `/admin`
+   - `ADMIN_PASSWORD` — a strong password for admin login
    - `SITE_URL` — fill this in *after* step 4, then redeploy (see below)
    - `ALLOWED_ORIGIN` — your website's domain, once you know it
    - `INTERNAL_CRON_KEY` — any long random string (e.g. `openssl rand -hex 32`); **use the exact same value** on both services, Render will ask for it twice
@@ -126,18 +126,14 @@ Render's free web services spin down after inactivity and take a few seconds to 
 - **Duplicate guard** — the same email submitting twice within 2 minutes is
   deduplicated (handles accidental double-clicks).
 
-For higher-traffic sites, consider adding Cloudflare Turnstile or hCaptcha to
-the form for an extra layer — not included here to keep the form frictionless,
-but straightforward to add to the `/api/guide-request` handler.
+For higher-traffic sites, consider adding Cloudflare Turnstile or hCaptcha to the form for an extra layer — not included here to keep the form frictionless, but straightforward to add to the `/api/guide-request` handler.
 
 ## One thing I did not fabricate: the Day 8 email
 
 The Day 8 nurture email ("client success story") ships as a clearly marked
 template — `[PLACEHOLDER — replace with a real client story]` — rather than
 an invented case study. Writing a fake client success story would mean
-putting words in a real person's mouth about an experience that didn't
-happen. Swap in a real story (with that client's permission) before this
-email goes live; see `lib/email.js` → `NURTURE_CONTENT.day8`.
+putting words in a real person's mouth about an experience that didn't happen. Swap in a real story (with that client's permission) before this email goes live; see `lib/email.js` → `NURTURE_CONTENT.day8`.
 
 ## Admin CMS (Properties, Media, SEO Automation, Leads CRM)
 
@@ -181,10 +177,10 @@ sma-backend/
     admin.js                    Admin dashboard logic (properties, media, CRM)
   routes/
     guide-request.js            POST /api/guide-request — validation, spam guard, orchestration
-    properties.js                Public property list/detail + admin CRUD/status/featured/reorder
-    leads.js                     Public property-inquiry form + admin CRM endpoints
-    admin-auth.js                POST /api/admin/login, /api/admin/logout
-    sitemap.js                   GET /sitemap.xml, generated live from your properties
+    properties.js               Public property list/detail + admin CRUD/status/featured/reorder
+    leads.js                    Public property-inquiry form + admin CRM endpoints
+    admin-auth.js               POST /api/admin/login, /api/admin/logout
+    sitemap.js                  GET /sitemap.xml, generated live from your properties
   lib/
     db.js                        SQLite schema + guide-download lead/nurture-queue helpers
     email.js                     Resend client + guide-download email templates
@@ -192,7 +188,7 @@ sma-backend/
     crm-db.js                    SQLite schema + CRM lead storage
     seo.js                       Slug + SEO title/meta/OG/structured-data generation
     auth.js                      Minimal admin session auth (see limitations above)
-    image-store.js                Base64 image upload handling + optional sharp/WebP conversion
+    image-store.js               Base64 image upload handling + optional sharp/WebP conversion
     property-inquiry-email.js    Email templates for the property-inquiry flow
     nurture-runner.js            Shared "send whatever's due" logic (used by both the CLI script and the HTTP cron endpoint)
   scripts/
