@@ -1,0 +1,45 @@
+name: Fix live listing currency mapping
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Patch public listing currency mapping
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('public/index.html')
+          s = p.read_text(encoding='utf-8')
+          old = "listings = data.properties.map(cmsPropertyToListing);"
+          new = "listings = data.properties.map(cmsPropertyToListing);\n      listings.forEach((listing, i) => { listing.currency = String(data.properties[i]?.currency || listing.currency || 'USD').toUpperCase(); });"
+          if old not in s:
+              raise SystemExit('Expected listing load line not found; refusing to make a blind change.')
+          if new in s:
+              print('Patch already present.')
+          else:
+              p.write_text(s.replace(old, new, 1), encoding='utf-8')
+              print('Patched listing currency mapping.')
+          PY
+
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "fix: map CMS currency directly to public listings"
+            git push
+          fi
