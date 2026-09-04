@@ -2297,8 +2297,9 @@ const icons = {
   sqft:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"/><path d="M4 9h4M4 15h4M20 9h-4M20 15h-4"/></svg>',
 };
 
-function fmtPrice(v, isRent){
-  const val = currency.mode === 'USD' ? v : Math.round(v*currency.rate);
+function fmtPrice(v, isRent, propertyCurrency){
+  const source = String(propertyCurrency || 'USD').toUpperCase();
+  const val = source === currency.mode ? v : (currency.mode === 'USD' ? Math.round(v/currency.rate) : Math.round(v*currency.rate));
   return '$' + val.toLocaleString('en-US') + (isRent ? '/mo' : '');
 }
 
@@ -2397,7 +2398,7 @@ function renderListings(){
         <div class="card-hover-info"><div class="amenities">${l.amenities.map(a=>`<span>${a}</span>`).join('')}</div></div>
       </div>
       <div class="card-body">
-        <div class="card-price">${fmtPrice(l.price, l.mode==='rent')} <span class="mxn">${currency.mode==='USD' ? 'USD':'MXN'}</span></div>
+        <div class="card-price">${fmtPrice(l.price, l.mode==='rent', l.currency)} <span class="mxn">${currency.mode==='USD' ? 'USD':'MXN'}</span></div>
         <div class="card-title">${l.title} · ${l.neigh}</div>
         <div class="card-address">${l.address}</div>
         <div class="card-meta">
@@ -2463,6 +2464,7 @@ function cmsPropertyToListing(p, idx){
     id: p.id,
     title: p.title,
     price: p.price,
+    currency: String(p.currency || 'USD').toUpperCase(),
     beds: p.bedrooms || 0,
     baths: p.bathrooms || 0,
     sqft,
@@ -2528,7 +2530,7 @@ function clearCompare(){
 }
 function openCompareModal(){
   const rows = [
-    {label:'Price', get:l=>fmtPrice(l.price, l.mode==='rent')},
+    {label:'Price', get:l=>fmtPrice(l.price, l.mode==='rent', l.currency)},
     {label:'Neighborhood', get:l=>l.neigh},
     {label:'Bedrooms', get:l=>l.beds},
     {label:'Bathrooms', get:l=>l.baths},
@@ -2639,7 +2641,7 @@ function openQuickView(e, i){
       ${l.photo ? '' : '<svg viewBox="0 0 100 80" fill="none" stroke="white" stroke-width="1" style="width:30%;"><path d="M15 78V38L50 12L85 38V78" /><path d="M30 78V50H70V78"/></svg>'}
     </div>
     <div class="modal-body">
-      <div class="card-price">${fmtPrice(l.price, l.mode==='rent')} <span class="mxn">${currency.mode==='USD' ? 'USD':'MXN'}</span></div>
+      <div class="card-price">${fmtPrice(l.price, l.mode==='rent', l.currency)} <span class="mxn">${currency.mode==='USD' ? 'USD':'MXN'}</span></div>
       <h3 style="margin-top:6px;">${l.title}</h3>
       <p style="color:var(--charcoal-2); margin:6px 0 16px;">${l.address} · ${l.neigh}, San Miguel de Allende</p>
       <div class="card-meta" style="margin-bottom:20px;">
@@ -2676,7 +2678,7 @@ function openPropertyPage(i){
         </button>
         <div class="pp-header">
           <div>
-            <div class="pp-price">${fmtPrice(l.price, l.mode==='rent')} <span class="mxn" style="font-size:13px;">${currency.mode==='USD' ? 'USD':'MXN'}</span></div>
+            <div class="pp-price">${fmtPrice(l.price, l.mode==='rent', l.currency)} <span class="mxn" style="font-size:13px;">${currency.mode==='USD' ? 'USD':'MXN'}</span></div>
             <div class="pp-addr">${l.address} · ${l.neigh}, San Miguel de Allende</div>
           </div>
           <div style="display:flex; gap:10px;">
@@ -3757,7 +3759,7 @@ document.querySelectorAll('.glow-card').forEach(card=>{
             <button class="pp-back" onclick="closeModal()">← Back to listings</button>
             <div class="pp-header">
               <div>
-                <div class="pp-price">${fmtPrice(property.price, property.status === 'for_rent')} <span class="mxn">${currency.mode === 'USD' ? 'USD' : 'MXN'}</span></div>
+                <div class="pp-price">${fmtPrice(property.price, property.status === 'for_rent', property.currency || (l && l.currency))} <span class="mxn">${currency.mode === 'USD' ? 'USD' : 'MXN'}</span></div>
                 <h2>${escHtml(property.title)}</h2>
                 <p style="color:var(--charcoal-2);">${escHtml(property.address || property.neighborhood || 'San Miguel de Allende')}</p>
               </div>
