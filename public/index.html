@@ -2744,7 +2744,7 @@ function openPropertyPage(i){
             return `<div class="card" style="cursor:pointer;" onclick="openPropertyPage(${si})">
               <div class="card-media"><div class="ph-photo" style="--p1:${s.p[0]};--p2:${s.p[1]};--p3:${s.p[2]}"></div></div>
               <div class="card-body" style="padding:14px;">
-                <div class="card-price" style="font-size:16px;">${fmtPrice(s.price, s.mode==='rent')}</div>
+                <div class="card-price" style="font-size:16px;">${fmtPrice(s.price, s.mode==='rent', s.currency)}</div>
                 <div class="card-title" style="font-size:12.5px;">${s.title}</div>
               </div>
             </div>`;
@@ -3368,6 +3368,7 @@ document.querySelectorAll('.glow-card').forEach(card=>{
       if(data.ok && data.property){
         const p = data.property;
         const fresh = cmsPropertyToListing(p, fallbackIndex || 0);
+        fresh.currency = String(p.currency || fresh.currency || ((window.listings || listings)[fallbackIndex || 0] || {}).currency || 'USD').toUpperCase();
         const detailImages = Array.isArray(p.images) ? p.images : (Array.isArray(p.images_json) ? p.images_json : []);
         fresh.photos = detailImages.map(resolvePropertyImage).filter(Boolean);
         if(!fresh.photos.length && p.featured_image) fresh.photos=[resolvePropertyImage(p.featured_image)];
