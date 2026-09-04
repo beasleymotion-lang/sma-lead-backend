@@ -3316,7 +3316,7 @@ document.querySelectorAll('.glow-card').forEach(card=>{
       ${galleryPhotos.length > 1 ? `<button type="button" class="gallery-prev" aria-label="Previous photo">‹</button><button type="button" class="gallery-next" aria-label="Next photo">›</button><div class="wb-photo-count">1 / ${galleryPhotos.length}</div><div class="wb-photo-thumbs">${galleryPhotos.map((src,n)=>`<button type="button" class="gallery-thumb ${n===0?'active':''}" data-gallery-index="${n}" aria-label="View photo ${n+1}"><img src="${escapeAttr(src)}" alt="${escapeAttr(l.title)} photo ${n+1}" loading="lazy" onerror="this.closest('button').style.display='none'"></button>`).join('')}</div>` : ''}
     </div>` :
       `<div class="ph-photo" style="--p1:${l.p[0]};--p2:${l.p[1]};--p3:${l.p[2]};height:100%"><span class="ph-label">Property photography available on request</span></div>`;
-    const price=typeof fmtPrice==='function'?fmtPrice(l.price,l.mode==='rent'):`$${Number(l.price||0).toLocaleString()}`;
+    const price=typeof fmtPrice==='function'?fmtPrice(l.price,l.mode==='rent',l.currency):`$${Number(l.price||0).toLocaleString()}`;
     body.innerHTML=`
       <div class="lux-detail-grid">
         <div class="lux-detail-gallery">${img}</div>
@@ -3368,6 +3368,7 @@ document.querySelectorAll('.glow-card').forEach(card=>{
       if(data.ok && data.property){
         const p = data.property;
         const fresh = cmsPropertyToListing(p, fallbackIndex || 0);
+        fresh.currency = String(((window.listings || listings)[fallbackIndex || 0] || {}).currency || p.currency || fresh.currency || 'USD').toUpperCase();
         fresh.currency = String(p.currency || fresh.currency || ((window.listings || listings)[fallbackIndex || 0] || {}).currency || 'USD').toUpperCase();
         const detailImages = Array.isArray(p.images) ? p.images : (Array.isArray(p.images_json) ? p.images_json : []);
         fresh.photos = detailImages.map(resolvePropertyImage).filter(Boolean);
