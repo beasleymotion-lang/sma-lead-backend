@@ -25,7 +25,10 @@ router.get('/properties', async (req, res) => {
     const q = req.query;
 
     const properties = await propertiesDb.listProperties({
-      status: q.status,
+      // Featured inventory is the site's curated showcase, so a featured
+      // request must be allowed to include both sales and rentals. The
+      // regular Buy/Rent filters still use status normally.
+      status: q.featured === 'true' ? undefined : q.status,
       neighborhood: q.neighborhood,
       minPrice: q.minPrice ? Number(q.minPrice) : undefined,
       maxPrice: q.maxPrice ? Number(q.maxPrice) : undefined,
