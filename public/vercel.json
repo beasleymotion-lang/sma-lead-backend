@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://sma-lead-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/",
+      "destination": "/home-redesign.html"
     }
   ]
 }
