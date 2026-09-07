@@ -25,6 +25,37 @@ const homeLinks = '<nav aria-label="San Miguel de Allende real estate guides" st
 const testimonialsSection = '<section id="property-guides" aria-labelledby="property-guides-title" style="max-width:1200px;margin:5rem auto;padding:0 1.25rem"><div style="text-align:center"><p style="letter-spacing:.12em;text-transform:uppercase;font-size:.78rem">Explore San Miguel</p><h2 id="property-guides-title">Start with useful local guides</h2><p>Explore neighborhoods, homes for sale, rentals, and practical property information to help organize your search.</p></div></section>';
 const mapSection = '<section id="explore-map" aria-labelledby="explore-map-title" style="max-width:1200px;margin:4rem auto 5rem;padding:0 1.25rem"><div style="background:#17221f;color:#f7f3ec;border-radius:24px;padding:clamp(2rem,5vw,4.5rem);display:grid;grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);gap:2.5rem;align-items:center"><div><p style="letter-spacing:.14em;text-transform:uppercase;font-size:.75rem;color:#d8b57c;margin:0 0 1rem">Interactive local guide</p><h2 id="explore-map-title" style="font-family:Georgia,serif;font-size:clamp(2.2rem,4vw,4rem);line-height:1;margin:0 0 1rem">Explore San Miguel before you choose where to live.</h2><p style="font-size:1.05rem;line-height:1.65;color:#d8ddd9;max-width:620px">See neighborhood boundaries, cafés, restaurants, hotels, landmarks, and the areas that make San Miguel de Allende unique.</p><a href="/map" style="display:inline-block;margin-top:1.25rem;background:#f7f3ec;color:#17221f;padding:.9rem 1.25rem;border-radius:999px;text-decoration:none;font-weight:700">Explore the interactive map →</a></div><a href="/map" aria-label="Open the San Miguel de Allende interactive map" style="display:block;min-height:300px;border-radius:16px;overflow:hidden;background:#d9d2c5;text-decoration:none;color:#17221f"><iframe src="/map" title="San Miguel de Allende interactive map preview" loading="lazy" style="width:100%;height:360px;border:0;pointer-events:none" tabindex="-1"></iframe></a></div><style>@media(max-width:760px){#explore-map>div{grid-template-columns:1fr!important}#explore-map iframe{height:260px!important}}</style></section>';
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatPropertyPrice(property) {
+  const value = Number(property?.price);
+  if (!Number.isFinite(value)) return '';
+  const currency = String(property?.currency || 'USD').toUpperCase();
+  const symbol = currency === 'MXN' ? 'MXN $' : '$';
+  return `${symbol}${Math.round(value).toLocaleString('en-US')}`;
+}
+
+function renderLivePropertyCards(properties) {
+  return properties.map((property) => {
+    const image = property?.featured_image || property?.images?.[0]?.url || '';
+    const slug = encodeURIComponent(property?.slug || property?.id || '');
+    const facts = [
+      property?.bedrooms ? `${property.bedrooms} bd` : '',
+      property?.bathrooms ? `${property.bathrooms} ba` : '',
+      property?.construction_m2 ? `${Number(property.construction_m2).toLocaleString('en-US')} m²` : ''
+    ].filter(Boolean).join(' · ');
+    const status = property?.status === 'for_rent' ? 'For Rent' : property?.status === 'for_sale' ? 'For Sale' : '';
+    return `<article class="withbeasley-live-property" style="background:#fff;border:1px solid rgba(23,34,31,.12);border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(23,34,31,.06)">${image ? `<a href="/properties/${slug}" aria-label="View ${escapeHtml(property.title)}"><img src="${escapeHtml(image)}" alt="${escapeHtml(property.title)}" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block"></a>` : ''}<div style="padding:1.1rem 1.15rem 1.25rem"><div style="display:flex;justify-content:space-between;gap:.75rem;align-items:center;margin-bottom:.45rem"><span style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#8a6a35">${escapeHtml(status)}</span><span style="font-weight:700">${escapeHtml(formatPropertyPrice(property))}</span></div><h3 style="font-family:Georgia,serif;font-size:1.25rem;line-height:1.15;margin:.2rem 0 .45rem"><a href="/properties/${slug}" style="color:inherit;text-decoration:none">${escapeHtml(property.title || 'Property in San Miguel de Allende')}</a></h3>${property.neighborhood ? `<p style="margin:0 0 .45rem;color:#5c625e">${escapeHtml(property.neighborhood)}</p>` : ''}${facts ? `<p style="margin:0;color:#6d726e;font-size:.92rem">${escapeHtml(facts)}</p>` : ''}</div></article>`;
+  }).join('');
+}
+
 const allowedOrigins = (process.env.ALLOWED_ORIGIN || SITE_URL).split(',').map(origin => origin.trim()).filter(Boolean);
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
@@ -47,7 +78,6 @@ app.use('/api', leadsRoute);
 app.use('/api', adminAuthRoute);
 app.use('/', sitemapRoute);
 
-// Consolidate duplicate SEO URLs so Google receives one clear canonical page per search intent.
 const seoRedirects = {
   '/san-miguel-de-allende-houses-for-sale': '/homes-for-sale-san-miguel-de-allende',
   '/san-miguel-de-allende-rentals': '/homes-for-rent-san-miguel-de-allende',
@@ -63,30 +93,44 @@ app.use('/', seoPagesRoute);
 app.use('/', seoGrowthRoute);
 
 app.get('/', (req, res, next) => {
-  fs.readFile(homeFile,'utf8',(error,html)=>{
+  fs.readFile(homeFile,'utf8',async (error,html)=>{
     if (error) return next(error);
-    res.set({'Link': `<${SITE_URL}/>; rel="canonical"`, 'Cache-Control':'no-store, max-age=0'});
-    let optimized = html
-      .replace(/<title>[^<]*<\/title>/i,`<title>${homeTitle}</title>`)
-      .replace(/<meta\s+name=["']description["'][^>]*>/i,`<meta name="description" content="${homeDescription}">`)
-      .replace(/<meta\s+name=["']robots["'][^>]*>/i,`<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">`)
-      .replace(/<\/head>/i,`${homeMetadata}</head>`);
-    optimized = optimized.replace(/\+1 \(555\) 123-4567/g,'Contact through the consultation form').replace(/blaze@sanmiguelrealty\.example/g,'Use the consultation form to get in touch').replace(/Property Photo Placeholder/g,'Property photo').replace(/Placeholder — photography of [^<]+/g,'');
-    optimized = optimized.replace(/I know buying a home in another country can feel exciting, but it can also feel overwhelming\. My goal is to make that journey as simple and enjoyable as possible by offering honest advice, local knowledge, and guidance you can trust from our first conversation to closing day\./i,'I know searching for a home in another country can feel exciting and overwhelming. My goal is to help you understand the local options, neighborhoods, and practical next steps while you make decisions that are right for you.');
-    optimized = optimized.replace(/one of my favorite parts of this job is helping people discover which one feels like home to them\./i,'one of my favorite parts of this work is helping people explore which areas feel like the best fit for their lifestyle.');
-    optimized = optimized.replace(/Focused on a smooth, personal buying & selling experience/i,'Focused on clear, personal property-search support');
-    optimized = optimized.replace(/Buying or selling in a foreign country requires more than a listing portal — it requires a guide who knows every street, every notario, and every detail that matters\./i,'Buying or selling property across borders can involve many moving parts. A thoughtful search starts with local context, accurate property information, and the right qualified professionals when specialized advice is needed.');
-    optimized = optimized.replace(/every neighborhood's rhythm, restrictions, and real value/i,'neighborhood character, daily rhythm, and the differences between local areas');
-    optimized = optimized.replace(/my direct cell — not a call center/i,'direct communication and a more personal point of contact');
-    optimized = optimized.replace(/for every listing I represent/i,'for properties I am asked to help present, subject to the services and permissions involved');
-    optimized = optimized.replace(/Rental yield, appreciation trends, and market timing guidance for buyers thinking beyond a first home\./i,'Property-focused research and neighborhood comparisons for buyers evaluating different options.');
-    optimized = optimized.replace(/Calm, informed negotiation that protects your interests from offer to closing\./i,'Clear communication and support as you evaluate next steps with the appropriate professionals involved.');
-    optimized = optimized.replace(/from our first conversation to closing day/gi,'through your property search and next steps');
-    optimized = optimized.replace(/Independently owned and operated · San Miguel de Allende, Gto\., Mexico/i,'Independent property-search and marketing platform · San Miguel de Allende, Gto., Mexico');
-    optimized = optimized.replace(/<h1[^>]*>\s*San Miguel de Allende\s*\*?Real Estate\*?\s*<\/h1>/i,'<h1>Own Something Extraordinary.</h1>');
-    optimized = optimized.replace(/Exceptional homes, local expertise, and personal guidance for buyers who expect more\. Discover a more considered way to find property in one of Mexico's most beautiful cities\./i,'Discover exceptional homes in San Miguel de Allende, thoughtfully selected for the way you want to live. Explore distinctive properties, beautiful neighborhoods, and a more personal approach to finding your place in the city.');
-    optimized = optimized.replace(/<\/body>/i,`${testimonialsSection}${mapSection}${homeLinks}</body>`);
-    res.type('html').send(optimized);
+    try {
+      const liveProperties = await propertiesDb.listProperties({ sort: 'featured' });
+      const featuredProperties = liveProperties.filter(property => property.featured);
+      const displayProperties = (featuredProperties.length ? featuredProperties : liveProperties).slice(0, 12);
+      const liveCount = liveProperties.length;
+      const cards = renderLivePropertyCards(displayProperties);
+      const liveSection = `<div id="withbeasley-live-properties" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin:2rem 0 1rem">${cards || '<p style="grid-column:1/-1;text-align:center;color:#6d726e">No properties are currently available.</p>'}</div><style>@media(max-width:640px){#withbeasley-live-properties{grid-template-columns:1fr!important}}</style>`;
+
+      res.set({'Link': `<${SITE_URL}/>; rel="canonical"`, 'Cache-Control':'no-store, max-age=0'});
+      let optimized = html
+        .replace(/<title>[^<]*<\/title>/i,`<title>${homeTitle}</title>`)
+        .replace(/<meta\s+name=["']description["'][^>]*>/i,`<meta name="description" content="${homeDescription}">`)
+        .replace(/<meta\s+name=["']robots["'][^>]*>/i,`<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">`)
+        .replace(/<\/head>/i,`${homeMetadata}</head>`);
+      optimized = optimized.replace(/\+1 \(555\) 123-4567/g,'Contact through the consultation form').replace(/blaze@sanmiguelrealty\.example/g,'Use the consultation form to get in touch').replace(/Property Photo Placeholder/g,'Property photo').replace(/Placeholder — photography of [^<]+/g,'');
+      optimized = optimized.replace(/I know buying a home in another country can feel exciting, but it can also feel overwhelming\. My goal is to make that journey as simple and enjoyable as possible by offering honest advice, local knowledge, and guidance you can trust from our first conversation to closing day\./i,'I know searching for a home in another country can feel exciting and overwhelming. My goal is to help you understand the local options, neighborhoods, and practical next steps while you make decisions that are right for you.');
+      optimized = optimized.replace(/one of my favorite parts of this job is helping people discover which one feels like home to them\./i,'one of my favorite parts of this work is helping people explore which areas feel like the best fit for their lifestyle.');
+      optimized = optimized.replace(/Focused on a smooth, personal buying & selling experience/i,'Focused on clear, personal property-search support');
+      optimized = optimized.replace(/Buying or selling in a foreign country requires more than a listing portal — it requires a guide who knows every street, every notario, and every detail that matters\./i,'Buying or selling property across borders can involve many moving parts. A thoughtful search starts with local context, accurate property information, and the right qualified professionals when specialized advice is needed.');
+      optimized = optimized.replace(/every neighborhood's rhythm, restrictions, and real value/i,'neighborhood character, daily rhythm, and the differences between local areas');
+      optimized = optimized.replace(/my direct cell — not a call center/i,'direct communication and a more personal point of contact');
+      optimized = optimized.replace(/for every listing I represent/i,'for properties I am asked to help present, subject to the services and permissions involved');
+      optimized = optimized.replace(/Rental yield, appreciation trends, and market timing guidance for buyers thinking beyond a first home\./i,'Property-focused research and neighborhood comparisons for buyers evaluating different options.');
+      optimized = optimized.replace(/Calm, informed negotiation that protects your interests from offer to closing\./i,'Clear communication and support as you evaluate next steps with the appropriate professionals involved.');
+      optimized = optimized.replace(/from our first conversation to closing day/gi,'through your property search and next steps');
+      optimized = optimized.replace(/Independently owned and operated · San Miguel de Allende, Gto\., Mexico/i,'Independent property-search and marketing platform · San Miguel de Allende, Gto., Mexico');
+      optimized = optimized.replace(/<h1[^>]*>\s*San Miguel de Allende\s*\*?Real Estate\*?\s*<\/h1>/i,'<h1>Own Something Extraordinary.</h1>');
+      optimized = optimized.replace(/Exceptional homes, local expertise, and personal guidance for buyers who expect more\. Discover a more considered way to find property in one of Mexico's most beautiful cities\./i,'Discover exceptional homes in San Miguel de Allende, thoughtfully selected for the way you want to live. Explore distinctive properties, beautiful neighborhoods, and a more personal approach to finding your place in the city.');
+      optimized = optimized.replace(/Curated selection\s+\d+\s+properties/i, `Curated selection ${liveCount} properties${liveSection}`);
+      optimized = optimized.replace(/<\/body>/i,`${testimonialsSection}${mapSection}${homeLinks}</body>`);
+      res.type('html').send(optimized);
+    } catch (err) {
+      console.error('[home] live property render failed:', err);
+      res.set({'Link': `<${SITE_URL}/>; rel="canonical"`, 'Cache-Control':'no-store, max-age=0'});
+      res.type('html').send(html);
+    }
   });
 });
 app.get('/map', (req, res, next) => {
