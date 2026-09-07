@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/:path*",
-      "destination": "https://sma-lead-backend.onrender.com/:path*"
+      "source": "/api/:path*",
+      "destination": "https://sma-lead-backend.onrender.com/api/:path*"
     }
   ]
 }
