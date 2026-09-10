@@ -2647,7 +2647,7 @@ function openQuickView(e, i){
       ${l.photo ? '' : '<svg viewBox="0 0 100 80" fill="none" stroke="white" stroke-width="1" style="width:30%;"><path d="M15 78V38L50 12L85 38V78" /><path d="M30 78V50H70V78"/></svg>'}
     </div>
     <div class="modal-body">
-      <div class="card-price">${fmtPrice(l.price, l.mode==='rent', l.currency)} <span class="mxn">${(currency.mode || l.currency || 'USD')==='USD' ? 'USD':'MXN'}</span></div>
+      <div class="card-price">${fmtPrice(l.price, l.mode==='rent', l.currency, false)} <span class="mxn">${(currency.mode || l.currency || 'USD')==='USD' ? 'USD':'MXN'}</span></div>
       <h3 style="margin-top:6px;">${l.title}</h3>
       <p style="color:var(--charcoal-2); margin:6px 0 16px;">${l.address} · ${l.neigh}, San Miguel de Allende</p>
       <div class="card-meta" style="margin-bottom:20px;">
