@@ -2297,12 +2297,7 @@ const icons = {
   sqft:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"/><path d="M4 9h4M4 15h4M20 9h-4M20 15h-4"/></svg>',
 };
 
-function fmtPrice(v, isRent, propertyCurrency){
-  const source = String(propertyCurrency || currency.mode || 'USD').toUpperCase();
-  const target = currency.mode || source;
-  const val = source === target ? v : (target === 'USD' ? Math.round(v/currency.rate) : Math.round(v*currency.rate));
-  return '$' + val.toLocaleString('en-US') + (isRent ? '/mo' : '');
-}
+function fmtPrice(v, isRent, propertyCurrency, convert=true){ const val = Number(v); return '$' + (Number.isFinite(val) ? val.toLocaleString('en-US') : '') + (isRent ? '/mo' : ''); }
 
 let brtMode = 'buy';
 
