@@ -16,7 +16,6 @@ jobs:
           import re
           p = Path('public/index.html')
           s = p.read_text(encoding='utf-8')
-          old = s
           pattern = r"function fmtPrice\(v, isRent, propertyCurrency(?:, convert=true)?\)\{.*?\}"
           replacement = "function fmtPrice(v, isRent, propertyCurrency, convert=true){   const val = Number(v);   return '$' + (Number.isFinite(val) ? val.toLocaleString('en-US') : '') + (isRent ? '/mo' : ''); }"
           s, n = re.subn(pattern, replacement, s, count=1)
@@ -24,7 +23,6 @@ jobs:
               raise SystemExit(f'Could not find fmtPrice function; matches={n}')
           p.write_text(s, encoding='utf-8')
           print('fmtPrice replaced:', n)
-          print('changed:', s != old)
           PY
       - name: Commit fix and remove workflow
         run: |
