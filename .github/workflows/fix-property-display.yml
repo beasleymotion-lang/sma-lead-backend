@@ -16,11 +16,15 @@ jobs:
           import re
           p = Path('public/index.html')
           s = p.read_text(encoding='utf-8')
-          pattern = r"function fmtPrice\(v, isRent, propertyCurrency(?:, convert=true)?\)\{.*?\}"
-          replacement = "function fmtPrice(v, isRent, propertyCurrency, convert=true){   const val = Number(v);   return '$' + (Number.isFinite(val) ? val.toLocaleString('en-US') : '') + (isRent ? '/mo' : ''); }"
+          pattern = r"function\s+fmtPrice\s*\([^)]*\)\s*\{[^}]*\}"
+          replacement = "function fmtPrice(v, isRent, propertyCurrency, convert=true){ const val = Number(v); return '$' + (Number.isFinite(val) ? val.toLocaleString('en-US') : '') + (isRent ? '/mo' : ''); }"
+          matches = re.findall(pattern, s)
+          print('fmtPrice matches:', len(matches))
+          for m in matches:
+              print('FOUND:', m)
           s, n = re.subn(pattern, replacement, s, count=1)
           if n != 1:
-              raise SystemExit(f'Could not find fmtPrice function; matches={n}')
+              raise SystemExit(f'Could not replace fmtPrice function; matches={n}')
           p.write_text(s, encoding='utf-8')
           print('fmtPrice replaced:', n)
           PY
