@@ -2399,7 +2399,7 @@ function renderListings(){
         <div class="card-hover-info"><div class="amenities">${l.amenities.map(a=>`<span>${a}</span>`).join('')}</div></div>
       </div>
       <div class="card-body">
-        <div class="card-price">${fmtPrice(l.price, l.mode==='rent', l.currency)} <span class="mxn">${(currency.mode || l.currency || 'USD')==='USD' ? 'USD':'MXN'}</span></div>
+        <div class="card-price">${fmtPrice(l.price, l.mode==='rent', l.currency, false)} <span class="mxn">${String(l.currency || 'USD').toUpperCase()==='USD' ? 'USD':'MXN'}</span></div>
         <div class="card-title">${l.title} · ${l.neigh}</div>
         <div class="card-address">${l.address}</div>
         <div class="card-meta">
