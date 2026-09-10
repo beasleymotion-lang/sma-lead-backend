@@ -1,4 +1,4 @@
-name: Fix property display
+name: Apply property display fix
 on:
   push:
     branches: [main]
@@ -6,42 +6,54 @@ permissions:
   contents: write
 jobs:
   fix:
-    if: github.event.head_commit.message != 'Fix property display: correct listing prices and photo sizing'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply display fixes
+      - name: Apply price and gallery fixes
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('public/index.html')
           s = p.read_text(encoding='utf-8')
+          changed = False
 
-          old_card = '${fmtPrice(l.price, l.mode===\'rent\', l.currency)} <span class="mxn">${(currency.mode || l.currency || \'USD\')===\'USD\' ? \'USD\':\'MXN\'}</span>'
-          new_card = '${fmtPrice(l.price, l.mode===\'rent\', l.currency, false)} <span class="mxn">${String(l.currency || \'USD\').toUpperCase()===\'USD\' ? \'USD\':\'MXN\'}</span>'
-          if old_card not in s:
-              raise SystemExit('Main listing card price pattern not found')
-          s = s.replace(old_card, new_card, 1)
-
-          old_gallery = '.lux-detail-gallery{min-height:520px;background:#181511;position:relative;overflow:hidden} .lux-detail-gallery img{width:100%;height:100%;min-height:520px;object-fit:cover;display:block}'
-          new_gallery = '.lux-detail-gallery{height:min(68vh,680px);min-height:0;background:#181511;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center} .lux-detail-gallery img{width:100%;height:100%;min-height:0;object-fit:contain;display:block}'
-          if old_gallery not in s:
-              raise SystemExit('Gallery CSS pattern not found')
-          s = s.replace(old_gallery, new_gallery, 1)
+          old_card = "${fmtPrice(l.price, l.mode==='rent', l.currency)}"
+          new_card = "${fmtPrice(l.price, l.mode==='rent', l.currency, false)}"
+          if old_card in s:
+              s = s.replace(old_card, new_card, 1)
+              changed = True
 
           old_fn = "function fmtPrice(v, isRent, propertyCurrency){   const source = String(propertyCurrency || currency.mode || 'USD').toUpperCase();   const target = currency.mode || source;   const val = source === target ? v : (target === 'USD' ? Math.round(v/currency.rate) : Math.round(v*currency.rate));   return '$' + val.toLocaleString('en-US') + (isRent ? '/mo' : ''); }"
           new_fn = "function fmtPrice(v, isRent, propertyCurrency, convert=true){   const source = String(propertyCurrency || currency.mode || 'USD').toUpperCase();   const target = convert ? (currency.mode || source) : source;   const val = source === target ? v : (target === 'USD' ? Math.round(v/currency.rate) : Math.round(v*currency.rate));   return '$' + val.toLocaleString('en-US') + (isRent ? '/mo' : ''); }"
-          if old_fn not in s:
-              raise SystemExit('Price formatter pattern not found')
-          s = s.replace(old_fn, new_fn, 1)
+          if old_fn in s:
+              s = s.replace(old_fn, new_fn, 1)
+              changed = True
 
-          p.write_text(s, encoding='utf-8')
+          old_gallery = '.lux-detail-gallery{min-height:520px;background:#181511;position:relative;overflow:hidden} .lux-detail-gallery img{width:100%;height:100%;min-height:520px;object-fit:cover;display:block}'
+          new_gallery = '.lux-detail-gallery{height:min(68vh,680px);min-height:0;background:#181511;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center} .lux-detail-gallery img{width:100%;height:100%;min-height:0;object-fit:contain;display:block}'
+          if old_gallery in s:
+              s = s.replace(old_gallery, new_gallery, 1)
+              changed = True
+
+          print('changed:', changed)
+          print('remaining old card calls:', s.count(old_card))
+          print('remaining old formatter:', s.count(old_fn))
+          print('remaining old gallery:', s.count(old_gallery))
+          if changed:
+              p.write_text(s, encoding='utf-8')
           PY
-      - name: Commit fixes and remove one-time workflow
+      - name: Commit fixes and remove workflow
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm .github/workflows/fix-property-display.yml
           git add public/index.html
-          git commit -m "Fix property display: correct listing prices and photo sizing"
+          if git diff --cached --quiet; then
+            echo "No source changes were needed."
+          else
+            git commit -m "Apply property card and gallery fix"
+            git push
+            exit 0
+          fi
+          git rm .github/workflows/fix-property-display.yml
+          git commit -m "Remove property display fix workflow"
           git push
