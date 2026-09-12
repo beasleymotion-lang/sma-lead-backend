@@ -2400,7 +2400,7 @@ function renderListings(){
         <div class="card-meta">
           <span>${icons.bed} ${l.beds} bd</span>
           <span>${icons.bath} ${l.baths} ba</span>
-          <span>${icons.sqft} ${l.sqft.toLocaleString()} ft²</span>
+          <span>${icons.sqft} ${l.lotSqft.toLocaleString()} ft²</span>
         </div>
         <div class="card-actions">
           <button type="button" class="btn btn-ghost listing-view-btn" aria-label="View ${l.title} property details" data-property-index="${i}" data-property-slug="${l.slug || ''}">View Property</button>
@@ -2455,6 +2455,7 @@ function cmsPropertyToListing(p, idx){
     .filter(Boolean);
   const primaryPhoto = imageUrls[0] || resolvePropertyImage(p.featured_image) || resolvePropertyImage(p.og_image) || '';
   const sqft = p.construction_size ? Math.round(p.construction_size * 10.7639) : 0;
+  const lotSqft = p.lot_size ? Math.round(p.lot_size * 10.7639) : 0;
   const tag = p.featured ? 'Featured' : ({for_sale:'New Listing', for_rent:'For Rent', pending:'Pending', sold:'Sold'}[p.status] || 'New Listing');
   return {
     id: p.id,
@@ -2464,6 +2465,7 @@ function cmsPropertyToListing(p, idx){
     beds: p.bedrooms || 0,
     baths: p.bathrooms || 0,
     sqft,
+    lotSqft,
     neigh: p.neighborhood || 'San Miguel de Allende',
     tag,
     mode: p.status === 'for_rent' ? 'rent' : 'sale',
@@ -2535,7 +2537,7 @@ function openCompareModal(){
     {label:'Neighborhood', get:l=>l.neigh},
     {label:'Bedrooms', get:l=>l.beds},
     {label:'Bathrooms', get:l=>l.baths},
-    {label:'Square Feet', get:l=>l.sqft.toLocaleString()+' ft²'},
+    {label:'Lot Size', get:l=>l.lotSqft.toLocaleString()+' ft²'},
     {label:'Amenities', get:l=>l.amenities.join(', ')},
   ];
   const props = compareList.map(i=>listings[i]);
@@ -2648,7 +2650,7 @@ function openQuickView(e, i){
       <div class="card-meta" style="margin-bottom:20px;">
         <span>${icons.bed} ${l.beds} bedrooms</span>
         <span>${icons.bath} ${l.baths} bathrooms</span>
-        <span>${icons.sqft} ${l.sqft.toLocaleString()} ft²</span>
+        <span>${icons.sqft} ${l.lotSqft.toLocaleString()} ft²</span>
       </div>
       <div class="amenities" style="margin-bottom:22px;">${l.amenities.map(a=>`<span style="border:1px solid var(--line); border-radius:999px; padding:5px 12px; font-size:11.5px; color:var(--charcoal-2); font-family:'IBM Plex Mono',monospace; margin-right:6px; display:inline-block; margin-bottom:6px;">${a}</span>`).join('')}</div>
       <div style="display:flex; gap:12px;">
@@ -2690,7 +2692,7 @@ function openPropertyPage(i){
         <div class="pp-meta">
           <span>${icons.bed} ${l.beds} bedrooms</span>
           <span>${icons.bath} ${l.baths} bathrooms</span>
-          <span>${icons.sqft} ${l.sqft.toLocaleString()} ft²</span>
+          <span>${icons.sqft} ${l.lotSqft.toLocaleString()} ft²</span>
         </div>
         <div class="pp-tabs">
           <button class="pp-tab active" data-tab="overview" onclick="ppTab(this)">Overview</button>
@@ -3323,7 +3325,7 @@ document.querySelectorAll('.glow-card').forEach(card=>{
           <div class="lux-detail-specs">
             <div><span>Bedrooms</span><strong>${l.beds||'—'}</strong></div>
             <div><span>Bathrooms</span><strong>${l.baths||'—'}</strong></div>
-            <div><span>Interior</span><strong>${l.sqft ? Number(l.sqft).toLocaleString()+' ft²':'—'}</strong></div>
+            <div><span>Lot Size</span><strong>${l.lotSqft ? Number(l.lotSqft).toLocaleString()+' ft²':'—'}</strong></div>
           </div>
           <div class="lux-client-note"><strong>Buying from abroad?</strong><p>Request a private presentation and we'll walk you through the property, purchase process, ownership considerations, and next steps from wherever you are.</p></div>
           <div class="lux-detail-actions"><a href="#contact" class="btn btn-gold" onclick="document.getElementById('luxury-detail-modal')?.classList.remove('open');document.body.style.overflow=''">Request Details</a><a href="#contact" class="btn btn-dark" onclick="document.getElementById('luxury-detail-modal')?.classList.remove('open');document.body.style.overflow=''">Schedule a Tour</a></div>
@@ -3770,7 +3772,7 @@ document.querySelectorAll('.glow-card').forEach(card=>{
             <div class="card-meta" style="margin:18px 0;">
               <span>${icons.bed} ${property.bedrooms || 0} bedrooms</span>
               <span>${icons.bath} ${property.bathrooms || 0} bathrooms</span>
-              <span>${icons.sqft} ${property.construction_size ? Math.round(property.construction_size * 10.7639).toLocaleString() : 0} ft²</span>
+              <span>${icons.sqft} ${property.lot_size ? Math.round(property.lot_size * 10.7639).toLocaleString() : 0} ft²</span>
             </div>
             <p>${escHtml(property.luxury_description || property.short_description || '')}</p>
             <div style="margin-top:24px;">
@@ -3844,7 +3846,7 @@ document.querySelectorAll('.glow-card').forEach(card=>{
     if (l.slug) return window.openLuxuryPropertyBySlug(l.slug, index);
     renderPropertyDetail({
       title: l.title, price: l.price, status: l.mode === 'rent' ? 'for_rent' : 'for_sale',
-      bedrooms: l.beds, bathrooms: l.baths, construction_size: l.sqft / 10.7639,
+      bedrooms: l.beds, bathrooms: l.baths, construction_size: l.sqft / 10.7639, lot_size: l.lotSqft / 10.7639,
       address: l.address, neighborhood: l.neigh, featured_image: l.photo,
       images: (l.photos || []).map(function (url) { return { url: url }; })
     }, l);
@@ -3943,7 +3945,7 @@ document.querySelectorAll('.glow-card').forEach(card=>{
     document.getElementById('wb-fpv-kicker').textContent=active.tag||'Private Property Presentation';
     document.getElementById('wb-fpv-address').textContent=[active.address,active.neighborhood||f?.neigh].filter(Boolean).join(' · ');
     document.getElementById('wb-fpv-price').textContent=active.price!=null?(typeof fmtPrice==='function'?fmtPrice(active.price,active.status==='for_rent'||active.mode==='rent'):Number(active.price).toLocaleString()):'';
-    document.getElementById('wb-fpv-meta').innerHTML=[['Bedrooms',active.bedrooms??f?.beds],['Bathrooms',active.bathrooms??f?.baths],['Interior',active.construction_size?Math.round(active.construction_size*10.7639).toLocaleString()+' ft²':(active.sqft?Number(active.sqft).toLocaleString()+' ft²':'')]].map(x=>`<div>${x[0]}<strong>${x[1]??'—'}</strong></div>`).join('');
+    document.getElementById('wb-fpv-meta').innerHTML=[['Bedrooms',active.bedrooms??f?.beds],['Bathrooms',active.bathrooms??f?.baths],['Lot Size',active.lot_size?Math.round(active.lot_size*10.7639).toLocaleString()+' ft²':(active.lotSqft?Number(active.lotSqft).toLocaleString()+' ft²':'')]].map(x=>`<div>${x[0]}<strong>${x[1]??'—'}</strong></div>`).join('');
     document.getElementById('wb-fpv-copy').textContent=active.luxury_description||active.short_description||`A private property presentation for ${active.neighborhood||f?.neigh||'San Miguel de Allende'}. Request a tour for full details, availability, and next steps.`;
     const thumbs=document.getElementById('wb-fpv-thumbs');
     thumbs.innerHTML=photos.map((u,i)=>`<button type="button" data-i="${i}" aria-label="View photo ${i+1}"><img src="${esc(u)}" alt="Photo ${i+1}" loading="lazy"></button>`).join('');
