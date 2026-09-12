@@ -1,1 +1,11 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Own Something Extraordinary | WithBeasley</title></head><body><main><h1>Own Something Extraordinary.</h1><p>San Miguel de Allende properties, presented directly by WithBeasley.</p><div id="properties"></div></main><script>(async()=>{const el=document.getElementById('properties');try{const r=await fetch('https://sma-lead-backend.onrender.com/api/properties');if(!r.ok)throw 0;const d=await r.json();const a=Array.isArray(d)?d:(d.properties||d.data||[]);el.innerHTML='<h2>Featured Properties</h2>'+a.map(p=>{const lot=p.lot_size??p.lotSize??p.lot_area??null;return '<article><h3>'+String(p.title||p.name||'Property').replace(/[<>]/g,'')+'</h3>'+(lot!=null&&lot!==''?'<p><b>Lot size:</b> '+Number(lot).toLocaleString()+' m²</p>':'')+'</article>'}).join('')}catch(e){el.innerHTML=''}})()</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WithBeasley | Find Your Place in San Miguel de Allende</title>
+<meta http-equiv="refresh" content="0; url=/home.html">
+<script>window.location.replace('/home.html');</script>
+</head>
+<body></body>
+</html>
