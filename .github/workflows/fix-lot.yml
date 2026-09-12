@@ -1,0 +1,42 @@
+name: Fix lot measurement rendering
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch lot measurement fields only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('public/index.html')
+          s = p.read_text(encoding='utf-8')
+          replacements = [
+            ("const sqft = p.construction_size ? Math.round(p.construction_size * 10.7639) : 0;", "const sqft = p.construction_size ? Math.round(p.construction_size * 10.7639) : 0;\n  const lotSqft = p.lot_size ? Math.round(p.lot_size * 10.7639) : 0;"),
+            ("    sqft,\n    neigh:", "    sqft,\n    lotSqft,\n    neigh:"),
+            ("<span>${icons.sqft} ${l.sqft.toLocaleString()} ft²</span>", "<span>${icons.sqft} ${l.lotSqft.toLocaleString()} ft²</span>"),
+            ("{label:'Square Feet', get:l=>l.sqft.toLocaleString()+' ft²'}", "{label:'Lot Size', get:l=>l.lotSqft.toLocaleString()+' ft²'}"),
+            ("<span>${icons.sqft} ${property.construction_size ? Math.round(property.construction_size * 10.7639).toLocaleString() : 0} ft²</span>", "<span>${icons.sqft} ${property.lot_size ? Math.round(property.lot_size * 10.7639).toLocaleString() : 0} ft²</span>"),
+            ("<span>${icons.sqft} ${l.sqft.toLocaleString()} ft²</span>", "<span>${icons.sqft} ${l.lotSqft.toLocaleString()} ft²</span>"),
+            ("<div><span>Interior</span><strong>${l.sqft ? Number(l.sqft).toLocaleString()+' ft²':'—'}</strong></div>", "<div><span>Lot Size</span><strong>${l.lotSqft ? Number(l.lotSqft).toLocaleString()+' ft²':'—'}</strong></div>"),
+            ("['Interior',active.construction_size?Math.round(active.construction_size*10.7639).toLocaleString()+' ft²':(active.sqft?Number(active.sqft).toLocaleString()+' ft²':'')]", "['Lot Size',active.lot_size?Math.round(active.lot_size*10.7639).toLocaleString()+' ft²':(active.lotSqft?Number(active.lotSqft).toLocaleString()+' ft²':'')]"),
+            ("construction_size: l.sqft / 10.7639,\n      address:", "construction_size: l.sqft / 10.7639, lot_size: l.lotSqft / 10.7639,\n      address:"),
+          ]
+          for old, new in replacements:
+              if old in s:
+                  s = s.replace(old, new)
+          p.write_text(s, encoding='utf-8')
+          if 'lotSqft' not in s:
+              raise SystemExit('Lot patch did not apply')
+          PY
+      - name: Commit lot fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/index.html
+          git diff --cached --quiet || git commit -m 'Fix listing lot measurements only'
+          git push
