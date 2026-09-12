@@ -1,0 +1,38 @@
+name: Fix homepage headline
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore original homepage and change only the headline
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore original design and replace headline
+        shell: bash
+        run: |
+          git checkout 747b2379543a5ed0f364b3f17af6459591fb0c0f -- public/index.html
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('public/index.html')
+          s = p.read_text(encoding='utf-8')
+          old = 'San Miguel de Allende Real Estate.'
+          new = 'Own Something Extraordinary.'
+          if s.count(old) != 1:
+              raise SystemExit(f'Expected exactly one headline, found {s.count(old)}')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+          PY
+          rm .github/workflows/fix-homepage-headline.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/index.html .github/workflows/fix-homepage-headline.yml
+          git commit -m 'Change homepage headline only'
+          git push origin main
