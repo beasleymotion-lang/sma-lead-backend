@@ -22,13 +22,20 @@ jobs:
           git checkout 747b2379543a5ed0f364b3f17af6459591fb0c0f -- public/index.html
           python - <<'PY'
           from pathlib import Path
+          import re
           p = Path('public/index.html')
           s = p.read_text(encoding='utf-8')
-          old = 'San Miguel de Allende Real Estate.'
-          new = 'Own Something Extraordinary.'
-          if s.count(old) != 1:
-              raise SystemExit(f'Expected exactly one headline, found {s.count(old)}')
-          p.write_text(s.replace(old, new), encoding='utf-8')
+          pattern = r'(<h1\b[^>]*>)(.*?)(</h1>)'
+          matches = list(re.finditer(pattern, s, flags=re.I | re.S))
+          if not matches:
+              raise SystemExit('No h1 found in the original homepage')
+          # The original homepage has a single hero h1. Replace only its visible text.
+          m = matches[0]
+          old = m.group(2)
+          print('Original hero h1:', re.sub(r'<[^>]+>', '', old).strip())
+          replacement = m.group(1) + 'Own Something Extraordinary.' + m.group(3)
+          s = s[:m.start()] + replacement + s[m.end():]
+          p.write_text(s, encoding='utf-8')
           PY
           rm .github/workflows/fix-homepage-headline.yml
           git config user.name 'github-actions[bot]'
