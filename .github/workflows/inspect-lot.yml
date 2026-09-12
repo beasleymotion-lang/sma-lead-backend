@@ -1,0 +1,27 @@
+name: Inspect lot rendering
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect lot code
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('public/index.html').read_text(encoding='utf-8')
+          for needle in ['lot_size','construction_size','Lot Size','lot size','sq ft','ft²','m²']:
+              print('\n===',needle,'===')
+              start=0
+              count=0
+              while True:
+                  i=s.find(needle,start)
+                  if i<0: break
+                  print(s[max(0,i-500):min(len(s),i+900)].replace('\n',' '))
+                  start=i+len(needle); count+=1
+                  if count>=12: break
+          PY
