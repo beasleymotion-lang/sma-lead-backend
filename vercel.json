@@ -5,6 +5,10 @@
       "destination": "https://sma-lead-backend.onrender.com/api/:path*"
     },
     {
+      "source": "/properties",
+      "destination": "/properties-fast.html"
+    },
+    {
       "source": "/",
       "destination": "/home-redesign.html"
     }
