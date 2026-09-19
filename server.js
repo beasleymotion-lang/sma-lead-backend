@@ -20,6 +20,7 @@ const ADMIN_BODY_LIMIT = process.env.ADMIN_BODY_LIMIT || '25mb';
 const homeFile = path.join(__dirname, 'public', 'index.html');
 const homeTitle = 'Find Your Place in San Miguel de Allende | WithBeasley';
 const homeDescription = 'Find your place in San Miguel de Allende with WithBeasley. Explore distinctive homes, neighborhoods, and property opportunities with personal local guidance.';
+let homePropertyCache = { expiresAt: 0, properties: [] };
 const homeMetadata = `<link rel="canonical" href="${SITE_URL}/"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"><meta name="author" content="Blaze Beasley"><meta property="og:type" content="website"><meta property="og:url" content="${SITE_URL}/"><meta property="og:site_name" content="WithBeasley"><meta property="og:title" content="${homeTitle}"><meta property="og:description" content="${homeDescription}"><meta property="og:locale" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${homeTitle}"><meta name="twitter:description" content="${homeDescription}"><script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'WebSite',name:'WithBeasley',url:SITE_URL+'/',description:'San Miguel de Allende real estate, homes, properties and relocation guidance.',inLanguage:'en-US',publisher:{'@type':'Person',name:'Blaze Beasley',url:SITE_URL+'/'}}).replace(/</g,'\\u003c')}</script><script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'Person',name:'Blaze Beasley',url:SITE_URL+'/',description:'Independent property advisor and local guide serving clients exploring homes, rentals, and property opportunities in San Miguel de Allende, Guanajuato, Mexico.',jobTitle:'Independent Property Advisor',homeLocation:{'@type':'City',name:'San Miguel de Allende',containedInPlace:{'@type':'State',name:'Guanajuato'}}}).replace(/</g,'\\u003c')}</script>`;
 const homeLinks = '<nav aria-label="San Miguel de Allende real estate guides" style="max-width:1200px;margin:0 auto 2rem;padding:0 1rem"><a href="/san-miguel-de-allende-real-estate">San Miguel Real Estate</a> · <a href="/homes-for-sale-san-miguel-de-allende">Homes for Sale</a> · <a href="/homes-for-rent-san-miguel-de-allende">Homes for Rent</a> · <a href="/buying-a-home-in-san-miguel-de-allende">Buying a Home</a> · <a href="/moving-to-san-miguel-de-allende">Moving Guide</a> · <a href="/neighborhoods">Neighborhoods</a></nav>';
 const testimonialsSection = '<section id="property-guides" aria-labelledby="property-guides-title" style="max-width:1200px;margin:5rem auto;padding:0 1.25rem"><div style="text-align:center"><p style="letter-spacing:.12em;text-transform:uppercase;font-size:.78rem">Explore San Miguel</p><h2 id="property-guides-title">Start with useful local guides</h2><p>Explore neighborhoods, homes for sale, rentals, and practical property information to help organize your search.</p></div></section>';
@@ -96,14 +97,18 @@ app.get('/', (req, res, next) => {
   fs.readFile(homeFile,'utf8',async (error,html)=>{
     if (error) return next(error);
     try {
-      const liveProperties = await propertiesDb.listProperties({ sort: 'featured' });
+      let liveProperties = homePropertyCache.expiresAt > Date.now() ? homePropertyCache.properties : null;
+      if (!liveProperties) {
+        liveProperties = await propertiesDb.listProperties({ sort: 'featured' });
+        homePropertyCache = { expiresAt: Date.now() + 60_000, properties: liveProperties };
+      }
       const featuredProperties = liveProperties.filter(property => property.featured);
       const displayProperties = (featuredProperties.length ? featuredProperties : liveProperties).slice(0, 12);
       const liveCount = liveProperties.length;
       const cards = renderLivePropertyCards(displayProperties);
       const liveSection = `<div id="withbeasley-live-properties" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin:2rem 0 1rem">${cards || '<p style="grid-column:1/-1;text-align:center;color:#6d726e">No properties are currently available.</p>'}</div><style>@media(max-width:640px){#withbeasley-live-properties{grid-template-columns:1fr!important}}</style>`;
 
-      res.set({'Link': `<${SITE_URL}/>; rel="canonical"`, 'Cache-Control':'no-store, max-age=0'});
+      res.set({'Link': `<${SITE_URL}/>; rel="canonical"`, 'Cache-Control':'public, max-age=60, s-maxage=300, stale-while-revalidate=600'});
       let optimized = html
         .replace(/<title>[^<]*<\/title>/i,`<title>${homeTitle}</title>`)
         .replace(/<meta\s+name=["']description["'][^>]*>/i,`<meta name="description" content="${homeDescription}">`)
