@@ -29,6 +29,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ ok: false, error: 'Property not found.' });
     }
 
+    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=900');
     return res.status(200).json({
       ok: true,
       property,
