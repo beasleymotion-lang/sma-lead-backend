@@ -16,14 +16,103 @@
 .section{padding:110px 0}.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:42px}.sectionhead h2{font-size:clamp(42px,5vw,66px);max-width:650px}.sectionhead p{max-width:370px;color:#6d685f;font-size:14px;line-height:1.8}.kicker{margin-bottom:14px}.properties{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.card{background:#fff;box-shadow:0 15px 45px rgba(30,25,18,.07);overflow:hidden}.cardimg{height:330px;background:linear-gradient(135deg,#594637,#b48a5a);position:relative;overflow:hidden}.cardimg img{width:100%;height:100%;object-fit:cover}.badge{position:absolute;left:14px;top:14px;background:rgba(255,255,255,.92);padding:7px 10px;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase}.cardbody{padding:22px}.price{font:400 26px 'DM Serif Display',serif}.meta{color:#777166;font-size:11px;margin:7px 0 13px;line-height:1.7}.cardtitle{font:400 24px 'DM Serif Display',serif;margin-bottom:12px}.view{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold)}#empty{text-align:center;padding:45px;color:#777;display:none}.loading{color:#8a8378;font-size:13px}
 .story{background:var(--ink);color:#fff;padding:110px 0}.storygrid{display:grid;grid-template-columns:1.05fr .95fr;gap:90px;align-items:center}.story h2{font-size:clamp(45px,5vw,72px);margin:15px 0 25px}.story p{color:rgba(255,255,255,.68);line-height:1.9;font-size:15px;max-width:520px}.storyvisual{min-height:480px;background:radial-gradient(circle at 55% 30%,rgba(210,178,123,.65),transparent 24%),linear-gradient(145deg,#6b4b35,#231a13 68%)}@media(max-width:800px){.properties{grid-template-columns:1fr 1fr}.storygrid{grid-template-columns:1fr;gap:45px}}@media(max-width:560px){.properties{grid-template-columns:1fr}.cardimg{height:300px}}
 .cta{margin:0 34px 70px;background:linear-gradient(125deg,#2a2119,#5b402b);color:#fff;padding:85px 30px;text-align:center}.cta h2{font-size:clamp(45px,6vw,78px);max-width:760px;margin:0 auto 24px}.cta p{color:rgba(255,255,255,.68);max-width:520px;margin:0 auto 30px;font-size:14px;line-height:1.8}.footer{padding:55px 0;background:#11100e;color:rgba(255,255,255,.65)}.footerin{display:flex;justify-content:space-between;gap:30px}.footer strong{font:400 25px 'DM Serif Display',serif;color:#fff}@media(max-width:650px){.footerin{flex-direction:column}.cta{margin-left:20px;margin-right:20px}}
+
+/* Restored homepage sections, using the existing WithBeasley design system */
+.intro{padding:105px 0 90px;background:var(--paper)}
+.introgrid{display:grid;grid-template-columns:.8fr 1.2fr;gap:80px;align-items:start}
+.intro h2,.subhead h2{font-size:clamp(42px,5vw,66px);margin:14px 0 24px}
+.introcopy{font-size:15px;line-height:1.95;color:#625c53}
+.introquote{font:italic 24px/1.5 'DM Serif Display',serif;color:#8d6d43;margin-top:28px;max-width:620px}
+.subhead{max-width:720px;margin-bottom:42px}
+.subhead p{color:#6d685f;font-size:14px;line-height:1.8;max-width:600px}
+.tilegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.tile{background:#fff;padding:28px;min-height:190px;box-shadow:0 12px 36px rgba(30,25,18,.05)}
+.tile small{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.tile h3{font-size:27px;margin:15px 0 12px}
+.tile p{font-size:13px;line-height:1.8;color:#716b62;margin:0}
+.featureband{background:var(--paper2);padding:100px 0}
+.featuregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.feature{padding:30px;background:rgba(255,255,255,.68);border:1px solid var(--line)}
+.feature h3{font-size:25px;margin:15px 0}
+.feature p{font-size:13px;line-height:1.8;color:#716b62}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:step}
+.step{border-top:1px solid var(--gold);padding-top:20px}
+.step:before{counter-increment:step;content:'0' counter(step);font:500 11px 'IBM Plex Mono',monospace;color:var(--gold)}
+.step h3{font-size:28px;margin:17px 0 12px}
+.step p{font-size:13px;line-height:1.8;color:#716b62}
+.resourcegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.resource{background:#211b15;color:#fff;padding:34px}
+.resource h3{font-size:32px;margin:15px 0}
+.resource p{font-size:13px;line-height:1.8;color:rgba(255,255,255,.68)}
+.resource a{display:inline-block;margin-top:15px;color:var(--gold2);font-size:12px;font-weight:700}
+.faqgrid{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.faq{padding:22px 0;border-bottom:1px solid var(--line)}
+.faq h3{font-size:21px;margin-bottom:10px}
+.faq p{font-size:13px;line-height:1.8;color:#716b62;margin:0}
+.contactband{background:#171512;color:#fff;padding:100px 0}
+.contactgrid{display:grid;grid-template-columns:1.2fr .8fr;gap:60px;align-items:center}
+.contactband h2{font-size:clamp(44px,6vw,76px);margin:15px 0 22px}
+.contactband p{font-size:14px;line-height:1.9;color:rgba(255,255,255,.68);max-width:620px}
+.contactdetails{border-left:1px solid rgba(255,255,255,.2);padding-left:32px;font-size:13px;line-height:2.2;color:rgba(255,255,255,.75)}
+@media(max-width:800px){.introgrid,.contactgrid{grid-template-columns:1fr;gap:28px}.tilegrid,.featuregrid{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr;gap:28px}.faqgrid{grid-template-columns:1fr}}
+@media(max-width:560px){.tilegrid,.featuregrid,.resourcegrid{grid-template-columns:1fr}.intro{padding:75px 0 65px}.featureband{padding:75px 0}}
+
 </style>
 </head>
 <body>
-<nav class="nav" id="nav"><div class="wrap navin"><a class="brand" href="/">Blaze Beasley</a><div class="links"><a href="/">Home</a><a href="/properties">Properties</a><a href="/homes-for-sale-san-miguel-de-allende">Buy</a><a href="/selling-a-home-in-san-miguel-de-allende">Sell</a><a href="/homes-for-rent-san-miguel-de-allende">Rent</a><a href="/neighborhoods">Neighborhoods</a></div><a class="navcta" href="#contact">Speak with Blaze</a></div></nav>
+<nav class="nav" id="nav"><div class="wrap navin"><a class="brand" href="/">Blaze Beasley</a><div class="links"><a href="/">Home</a><a href="/properties">Properties</a><a href="/homes-for-sale-san-miguel-de-allende">Buy</a><a href="/selling-a-home-in-san-miguel-de-allende">Sell</a><a href="/homes-for-rent-san-miguel-de-allende">Rent</a><a href="/neighborhoods">Neighborhoods</a></div><a class="navcta" href="#about">Meet Blaze</a></div></nav>
 <main>
 <section class="hero"><div class="wrap"><div class="eyebrow">Private homes · Local perspective · Personal service</div><h1>Own Something <em>Extraordinary.</em></h1><p>Discover the homes, neighborhoods and character that make San Miguel unlike anywhere else, with a more personal way to search.</p><div class="actions"><a class="btn gold" href="/properties">Explore properties</a><a class="btn outline" href="#contact">Work with Blaze</a></div></div><div class="hero-bottom wrap"><span>WithBeasley</span><span>San Miguel de Allende</span></div></section>
 <div class="search"><div class="searchbox"><div class="fields"><div class="field"><label>Property type</label><select id="type"><option value="">Any type</option><option>House</option><option>Condominium</option><option>Villa</option><option>Land</option></select></div><div class="field"><label>Price</label><select id="price"><option value="">Any price</option><option value="100000">Under $100k</option><option value="250000">Under $250k</option><option value="500000">Under $500k</option><option value="1000000">Under $1M</option></select></div><div class="field"><label>Beds</label><select id="beds"><option value="">Any</option><option>1+</option><option>2+</option><option>3+</option><option>4+</option></select></div><div class="field"><label>Baths</label><select id="baths"><option value="">Any</option><option>1+</option><option>2+</option><option>3+</option></select></div><div class="field"><label>Neighborhood</label><select id="hood"><option value="">Anywhere</option><option>Centro</option><option>Guadiana</option><option>San Antonio</option><option>La Lejona</option><option>Los Frailes</option><option>Ventanas</option></select></div><button class="go" onclick="loadProperties()">Search</button></div></div></div>
+
+<section class="intro" id="about"><div class="wrap introgrid">
+<div><div class="eyebrow">Meet your local connection</div><h2>Hi, I’m Blaze Beasley.</h2><div class="introquote">“I moved to San Miguel at eighteen and never looked back. Now I get to help other people fall for this city the way I did.”</div></div>
+<div class="introcopy"><p>I still remember the first time I walked through the streets here. There was something about this place: the church bells in the morning, the colorful streets, the people. Life just moved a little more intentionally. What started as a new adventure quickly became home.</p><p>Living here has given me the chance to experience San Miguel beyond the postcards: exploring different neighborhoods, discovering hidden cafés, watching sunsets over the city, and getting to know the people who make this place special. Every neighborhood has its own personality, and one of my favorite parts of this work is helping people discover which one feels like home.</p><p>Buying, renting, or selling in another country can feel exciting, but it can also feel overwhelming. My goal is to make the process clearer and more enjoyable with honest information, local knowledge, and personal help from the first conversation onward.</p><p>Whether you’re relocating, searching for a vacation home, or exploring an investment, I’d love to help you get to know San Miguel and find the right next step.</p><a class="btn gold" href="#contact">Get to know San Miguel</a></div>
+</div></section>
 <section class="section"><div class="wrap"><div class="sectionhead"><div><div class="eyebrow kicker">The collection</div><h2>Homes worth slowing down for.</h2></div><p>Current opportunities pulled directly from the live property database. Lot measurements shown here come from the same property records used by the Admin Dashboard.</p></div><div id="properties"><div class="loading">Loading current properties…</div></div><div id="empty">No properties match those filters yet.</div></div></section>
+
+<section class="featureband" id="neighborhood-guides"><div class="wrap">
+<div class="subhead"><div class="eyebrow">Browse by location</div><h2>Explore San Miguel by neighborhood.</h2><p>Every district has its own rhythm. Start with the areas that fit the way you want to live, then explore available properties.</p></div>
+<div class="tilegrid">
+<a class="tile" href="/neighborhoods"><small>Historic & walkable</small><h3>Centro</h3><p>Historic streets, galleries, restaurants, and the heart of the city.</p></a>
+<a class="tile" href="/neighborhoods"><small>Creative & connected</small><h3>San Antonio</h3><p>Studios, cafés, local character, and an easy connection to Centro.</p></a>
+<a class="tile" href="/neighborhoods"><small>Residential & leafy</small><h3>Guadiana</h3><p>Quiet streets, established homes, and a relaxed residential feel.</p></a>
+<a class="tile" href="/neighborhoods"><small>Elevated & scenic</small><h3>Atascadero</h3><p>Views, larger homes, and a little more room to breathe.</p></a>
+<a class="tile" href="/neighborhoods"><small>Modern convenience</small><h3>La Lejona</h3><p>Newer construction and practical access around the city.</p></a>
+<a class="tile" href="/neighborhoods"><small>Golf & country living</small><h3>Malanquín</h3><p>Established residential communities and a quieter pace.</p></a>
+</div></div></section>
+<section class="section"><div class="wrap">
+<div class="subhead"><div class="eyebrow">Why WithBeasley</div><h2>Local knowledge. Personal attention.</h2><p>A property search should be about more than scrolling through listings. It should help you understand the place, the process, and the choices in front of you.</p></div>
+<div class="featuregrid">
+<div class="feature"><div class="eyebrow">01</div><h3>Local perspective</h3><p>On-the-ground knowledge of neighborhoods, daily life, and the details that matter when choosing an area.</p></div>
+<div class="feature"><div class="eyebrow">02</div><h3>Personal service</h3><p>Direct communication and a search shaped around your priorities, timing, and questions.</p></div>
+<div class="feature"><div class="eyebrow">03</div><h3>Clear communication</h3><p>Practical explanations and straightforward updates, without pressure or exaggerated promises.</p></div>
+</div></div></section>
+<section class="featureband"><div class="wrap">
+<div class="subhead"><div class="eyebrow">A clear way forward</div><h2>From first conversation to next steps.</h2><p>Whether you are buying from abroad or getting to know the city in person, the process starts with understanding what matters to you.</p></div>
+<div class="steps">
+<div class="step"><h3>Discover</h3><p>Talk through your goals, budget, timing, and the neighborhoods that interest you.</p></div>
+<div class="step"><h3>Curate</h3><p>Identify properties and areas worth your attention instead of sending an endless list.</p></div>
+<div class="step"><h3>Navigate</h3><p>Coordinate questions, property visits, and the next steps with a local point of contact.</p></div>
+</div></div></section>
+<section class="section"><div class="wrap">
+<div class="subhead"><div class="eyebrow">Free resources</div><h2>Make your next move with more clarity.</h2><p>Helpful guides for understanding the buying process and preparing for life in San Miguel de Allende.</p></div>
+<div class="resourcegrid">
+<div class="resource"><div class="eyebrow">For buyers</div><h3>The San Miguel Buyer’s Guide</h3><p>Fideicomiso trusts, closing costs, the notario process, and the questions to ask before making an offer.</p><a href="/sma-buyers-guide.pdf">Explore the buyer’s guide →</a></div>
+<div class="resource"><div class="eyebrow">For relocating</div><h3>The Moving Guide</h3><p>Practical information for planning a move, settling in, and getting familiar with everyday life in the city.</p><a href="/sma-moving-guide.pdf">Explore the moving guide →</a></div>
+</div></div></section>
+<section class="featureband"><div class="wrap">
+<div class="subhead"><div class="eyebrow">Common questions</div><h2>A few things worth knowing.</h2><p>Some of the first questions people ask when they are considering a move or property purchase in Mexico.</p></div>
+<div class="faqgrid">
+<div class="faq"><h3>Can foreigners buy property in San Miguel?</h3><p>Yes. San Miguel is outside Mexico’s restricted coastal and border zones. Foreign buyers can generally purchase directly, subject to the usual legal and due diligence process. Speak with a qualified local notario or attorney about your circumstances.</p></div>
+<div class="faq"><h3>How long does buying usually take?</h3><p>Timing depends on the property, title review, financing, and the parties involved. A notario can give you a transaction-specific timeline once the details are known.</p></div>
+<div class="faq"><h3>Can I rent before deciding to buy?</h3><p>Absolutely. Renting first can be a useful way to experience different neighborhoods and understand which location suits your daily routine.</p></div>
+<div class="faq"><h3>Do I need to speak Spanish?</h3><p>Spanish is valuable in daily life, but you can begin your property search in English and arrange qualified bilingual support for important legal and transaction matters.</p></div>
+</div></div></section>
+<section class="contactband" id="contact"><div class="wrap contactgrid">
+<div><div class="eyebrow">Start a conversation</div><h2>Let’s find your San Miguel.</h2><p>Whether you are buying, selling, renting, investing, or simply exploring the idea of living here, reach out. We can talk through the city, your priorities, and a sensible next step.</p><div class="actions"><a class="btn gold" href="mailto:beasleymotion@gmail.com">Email Blaze</a><a class="btn outline" href="https://wa.me/12109157177">WhatsApp</a></div></div>
+<div class="contactdetails"><strong>Blaze Beasley</strong><br>San Miguel de Allende, Guanajuato, Mexico<br><a href="mailto:beasleymotion@gmail.com">beasleymotion@gmail.com</a><br>+1 (210) 915-7177</div>
+</div></section>
 <section class="story"><div class="wrap storygrid"><div><div class="eyebrow">A local point of view</div><h2>San Miguel is more than a property search.</h2><p>It is the morning light on a cantera wall, the walk home through a quiet street, the courtyard you did not know you needed. WithBeasley is built around helping you understand the place first, then finding the right property within it.</p></div><div class="storyvisual"></div></div></section>
 <section class="cta" id="contact"><h2>Let’s find the right place.</h2><p>Tell me what you are looking for and I’ll help you navigate San Miguel and the properties worth seeing.</p><a class="btn gold" href="mailto:beasleymotion@gmail.com">Start a conversation</a></section>
 </main>
