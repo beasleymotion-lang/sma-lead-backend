@@ -1,7 +1,7 @@
 {
   "installCommand": "true",
   "buildCommand": "true",
-  "outputDirectory": "public",
+  "outputDirectory": ".",
   "rewrites": [
     {
       "source": "/properties",
