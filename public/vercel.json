@@ -9,6 +9,10 @@
       "destination": "/properties-fast.html"
     },
     {
+      "source": "/land",
+      "destination": "/properties-fast.html?type=Land"
+    },
+    {
       "source": "/homes-for-sale-san-miguel-de-allende",
       "destination": "/buy.html"
     },
