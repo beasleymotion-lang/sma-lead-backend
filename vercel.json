@@ -8,6 +8,46 @@
       "destination": "/properties-fast.html"
     },
     {
+      "source": "/properties/:slug",
+      "destination": "/property.html?slug=:slug"
+    },
+    {
+      "source": "/land",
+      "destination": "/properties-fast.html?type=Land"
+    },
+    {
+      "source": "/homes-for-sale-san-miguel-de-allende",
+      "destination": "/buy.html"
+    },
+    {
+      "source": "/buy",
+      "destination": "/buy.html"
+    },
+    {
+      "source": "/selling-a-home-in-san-miguel-de-allende",
+      "destination": "/sell.html"
+    },
+    {
+      "source": "/sell",
+      "destination": "/sell.html"
+    },
+    {
+      "source": "/homes-for-rent-san-miguel-de-allende",
+      "destination": "/rent.html"
+    },
+    {
+      "source": "/rent",
+      "destination": "/rent.html"
+    },
+    {
+      "source": "/neighborhoods",
+      "destination": "/neighborhoods.html"
+    },
+    {
+      "source": "/guides",
+      "destination": "/guides.html"
+    },
+    {
       "source": "/",
       "destination": "/home.html"
     }
